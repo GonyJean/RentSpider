@@ -13,11 +13,15 @@ var moment = require("moment");
 var czInfo58 = require("../../schema/cz");
 var request = require("request");
 var xml2js = require("xml2js");
+var fs = require("fs");
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8";
 var pageNum = 1;
 var targetNum = 100;
 var baseUrl = "http://xj.58.com/"; //地区url 自行修改
 var userAgents = require("../../until/userAgent"); //浏览器头
+import fonttools from 'fonttools';
+import { readFileSync } from 'fs';
+const { decompile, compile } = fonttools();
 requestProxy(superagent);
 charset(superagent);
 
@@ -26,6 +30,14 @@ charset(superagent);
 
 moment.locale("zh-cn");
 
+//  fs.writeFile("font.woff",base64Font,function (err) {
+//      if (err) throw err ;
+//      console.log("File Saved !"); //文件被保存
+//  }) ;
+
+const fontBuffer = readFileSync('font.ttf');
+const fontXMLBuffer = decompile(fontBuffer);
+const fontBinaryBuffer = compile(fontXMLBuffer);
 function insert(
   url,
   title,
@@ -191,12 +203,11 @@ async function getInfo(Num) {
       pageNum++;
       if (pageNum <= targetNum) {
         console.log("第" + pageNum + "页抓取结束");
-        setTimeout(getInfo, 500, pageNum);
+        setTimeout(getInfo, 50, pageNum);
       } else {
-        console.log(1111111111111111111);
+        console.log('获取结束');
         return;
       }
     });
 }
-
 getInfo(pageNum);
