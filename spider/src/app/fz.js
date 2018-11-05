@@ -19,25 +19,42 @@ var pageNum = 1;
 var targetNum = 100;
 var baseUrl = "http://xj.58.com/"; //地区url 自行修改
 var userAgents = require("../../until/userAgent"); //浏览器头
-import fonttools from 'fonttools';
-import { readFileSync } from 'fs';
-const { decompile, compile } = fonttools();
+
+// import fonttools from 'fonttools';
+import {base64Font,XMLDate} from '../../until/fontTransform';
 requestProxy(superagent);
 charset(superagent);
-
+ var dataBuffer = new Buffer(base64Font, 'base64');
+ var font_dict=[];
 // var eventproxy = require('eventproxy');  //流程控制
 // var ep = eventproxy();
-
 moment.locale("zh-cn");
+console.log(base64Font);
 
-//  fs.writeFile("font.woff",base64Font,function (err) {
-//      if (err) throw err ;
-//      console.log("File Saved !"); //文件被保存
-//  }) ;
+ fs.writeFile("font.woff",dataBuffer,function (err) {
+     if (err) throw err ;
+     console.log("File Saved !"); //文件被保存
+ }) ;
+// var XMLData = fs.readFile('6329.xml','utf-8',(e,r)=>{
+//      console.log(e,r); //文件被保存
+//     parser.parseString(r, function (err, result) {
+//         // allData = result.ttFont.glyf[0].TTGlyph
+//         for(var i=0;i< strings.length;i++ ){
+//             console.log(strings[i].$.name)
+//             console.log(strings[i]._)
+//         }
+//     });
 
-const fontBuffer = readFileSync('font.ttf');
-const fontXMLBuffer = decompile(fontBuffer);
-const fontBinaryBuffer = compile(fontXMLBuffer);
+// })
+
+  var parser = new xml2js.Parser();
+            // parser.parseString(res.text, function(err, result) {
+        
+            // });
+
+// const fontBuffer = readFileSync('font.ttf');
+// const fontXMLBuffer = decompile(fontBuffer);
+// const fontBinaryBuffer = compile(fontXMLBuffer);
 function insert(
   url,
   title,
@@ -118,6 +135,7 @@ async function getInfo(Num) {
       }
 
       var $ = cheerio.load(res.text);
+      var html = $('style')
       var list = $(".listUl li");
       var title = $(".des h2 a");
       var sum = $(".price .sum b").text() + $(".price .sum");
