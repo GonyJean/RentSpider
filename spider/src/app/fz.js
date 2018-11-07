@@ -22,7 +22,7 @@ var exec = require("child_process").exec;
 // import fonttools from 'fonttools';
 import { base64Font, XMLDate } from "../../until/fontTransform";
 import { baseReg } from "../../until/reg";
-import { str2utf8, uniencode } from "../../until/common";
+import { str2utf8, uniencode,decodeUnicode } from "../../until/common";
 requestProxy(superagent);
 charset(superagent);
 var dataBuffer = new Buffer(base64Font, "base64");
@@ -61,7 +61,7 @@ function insert(
     if (err) {
       console.log("Error:" + err);
     } else {
-      console.log("Res:" + res);
+      // console.log("Res:" + res);
     }
   });
 }
@@ -199,6 +199,9 @@ async function getInfo(Num) {
                       trFontlist[curIndex] = n.$.code;
                   });
                 });
+                trFontlist.map((l,i)=>{
+                       trFontlist[i]=trFontlist[i].replace('0x','u')
+                      })
               });
 
               console.log(trFontlist);
@@ -220,7 +223,9 @@ async function getInfo(Num) {
                   .attr("href");
                 var title = $(this)
                   .find(".des h2 a")
-                  .text();
+                  .text()
+                  .replace(/[\r\n&#x\s+]/g, "");
+                
                 var sum = $(this)
                   .find(".money .strongbox")
                   .text()
@@ -268,9 +273,6 @@ async function getInfo(Num) {
                       console.log("抓取第" + Num + "页信息的时候出错了");
                       return next(err);
                     }
-                    // console.log(res.body);
-                    // console.log(res.text);
-
                     var parser = new xml2js.Parser();
                     parser.parseString(res.text, function(err, result) {
                       location.lat =
@@ -279,39 +281,82 @@ async function getInfo(Num) {
                         result.GeocoderSearchResponse.result[0].location[0].lng[0];
                     });
 
-                    if (isPerson) {
+                    if (isPerson&&url) {
                       var realSum = "";
+                      var realTitle="";
+                      var realCm="";
+                      var realHuxing=""
                       var str = uniencode(sum);
-                      var str111 = uniencode("                            ");
-
+                      var strTitle = uniencode(title);
+                      var strCm = uniencode(cm);
+                      var strHuxing = uniencode(huxing);
                       var strArr = str.split("%");
+                      var titleArr = strTitle.split("%");
+                      var cmArr = strCm.split("%");
+                      var huxingArr = strHuxing.split("%");
                       strArr.map((l, i) => {
-                        strArr[i] = l.replace("u", "");
                         strArr[i] = strArr[i].toLowerCase();
-                        strArr[i] = "0x" + strArr[i];
+                        strArr[i] = strArr[i];
                       });
                       strArr.map((l, i) => {
-                        if (l != "0x") {
+                        if (l != "") {
                           realSum += trFontlist.indexOf(l);
                         }
                       });
+                      titleArr.map((l, i) => {
+                        var curL = trFontlist.indexOf(l.toLowerCase())==-1?false:true;
+                        // 是字体文件
+                        if(curL){
+                         realTitle+=trFontlist.indexOf(titleArr[i].toLowerCase())
+                        }
+                        // 不是字体文件
+                        else if (l != ""&&trFontlist.indexOf(titleArr[i].toLowerCase())==-1) {
+                            realTitle+=decodeUnicode('\\'+l)
+                        }
+                      });
+                      cmArr.map((l, i) => {
+                        var curL = trFontlist.indexOf(l.toLowerCase())==-1?false:true;
+                        // 是字体文件
+                        if(curL){
+                         realCm+=trFontlist.indexOf(cmArr[i].toLowerCase())
+                        }
+                        // 不是字体文件
+                        else if (l != ""&&trFontlist.indexOf(cmArr[i].toLowerCase())==-1) {
+                            realCm+=decodeUnicode('\\'+l)
+                        }
+                      });
+                      huxingArr.map((l, i) => {
+                        var curL = trFontlist.indexOf(l.toLowerCase())==-1?false:true;
+                        // 是字体文件
+                        if(curL){
+                         realHuxing+=trFontlist.indexOf(huxingArr[i].toLowerCase())
+                        }
+                        // 不是字体文件
+                        else if (l != ""&&trFontlist.indexOf(huxingArr[i].toLowerCase())==-1) {
+                            realHuxing+=decodeUnicode('\\'+l)
+                        }
+                      });
+                      
 
                       insert(
                         url,
-                        title,
+                        realTitle,
                         realSum,
                         villageName,
                         area,
                         isPerson,
                         postTime,
                         location,
-                        cm,
-                        huxing
+                        realCm,
+                        realHuxing
                       );
                       console.log(
-                        "房价字体已经过转换:" + sum + "==>" + realSum
+                        "房价字体已经过转换:" + sum + "==>" + realSum+'\n'
+                      + "标题字体已转换:"+title+ "==>" + realTitle + "\n"
+                      + "户型字体已转换:"+huxing+ "==>" + realHuxing + "\n"
                       );
-                    } else {
+                    } 
+                    else  if(!isPerson&&url){
                       insert(
                         url,
                         title,
@@ -325,12 +370,13 @@ async function getInfo(Num) {
                         huxing
                       );
                     }
+                    
                   });
               });
               pageNum++;
               if (pageNum <= targetNum) {
                 console.log("第" + pageNum + "页抓取结束");
-                setTimeout(getInfo, 2000, pageNum);
+                setTimeout(getInfo, 2500, pageNum);
               } else {
                 console.log("获取结束");
                 return;

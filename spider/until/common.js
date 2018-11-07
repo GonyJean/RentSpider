@@ -23,3 +23,11 @@ export function uniencode(text)
  
     return text;
 } 
+
+
+
+export function decodeUnicode(str) {
+    str = str.replace(/\\/g, "%");
+    return unescape(str);
+}
+
