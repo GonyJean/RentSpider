@@ -3,8 +3,7 @@
  * 房租信息抓取
  *
  */
-
-var cheerio = require("cheerio"); //可以像jquer一样操作界面
+var cheerio = require("cheerio");
 var charset = require("superagent-charset"); //解决乱码问题:
 var superagent = require("superagent"); //发起请求
 var requestProxy = require("superagent-proxy"); //发起请求
@@ -23,7 +22,7 @@ var exec = require("child_process").exec;
 // import fonttools from 'fonttools';
 import { base64Font, XMLDate } from "../../until/fontTransform";
 import { baseReg } from "../../until/reg";
-import { str2utf8,uniencode } from "../../until/common";
+import { str2utf8, uniencode } from "../../until/common";
 requestProxy(superagent);
 charset(superagent);
 var dataBuffer = new Buffer(base64Font, "base64");
@@ -31,7 +30,6 @@ var font_dict = [];
 // var eventproxy = require('eventproxy');  //流程控制
 // var ep = eventproxy();
 moment.locale("zh-cn");
-
 
 var parser = new xml2js.Parser();
 
@@ -57,7 +55,7 @@ function insert(
     postTime,
     location,
     cm,
-    huxing,
+    huxing
   });
   info.save(function(err, res) {
     if (err) {
@@ -100,7 +98,6 @@ async function getIp() {
 async function getInfo(Num) {
   // var obj = await getIp()
   let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-
   // var ip = "http://" + obj.ip + ":" + obj.port;
   // if (obj.ip) console.log('代理获取成功:'+ip+',\n现在开始爬取信息...');
 
@@ -113,7 +110,6 @@ async function getInfo(Num) {
         console.log("抓取第" + Num + "页信息的时候出错了,错误信息:" + err);
         getInfo(Num);
         console.log("正在重新获取IP...");
-
         return;
       }
 
@@ -232,10 +228,10 @@ async function getInfo(Num) {
                 var cmArr = $(this)
                   .find(".des .room")
                   .text()
-                  .split('    ')
-                  // .replace(/[\r\n\s+]/g, "");
-                var huxing=cmArr[0].replace(/[\r\n\s+]/g, "") // 户型
-                var cm=cmArr[1] // 面积
+                  .split("    ");
+                // .replace(/[\r\n\s+]/g, "");
+                var huxing = cmArr[0].replace(/[\r\n\s+]/g, ""); // 户型
+                var cm = cmArr[1]; // 面积
                 var villageName = $(this)
                   .find(".add")
                   .find("a")
@@ -283,53 +279,53 @@ async function getInfo(Num) {
                         result.GeocoderSearchResponse.result[0].location[0].lng[0];
                     });
 
-                     if (isPerson) {
-                      var realSum=''
-                      var str = uniencode(sum)
-                      var str111 = uniencode('                            ')
-                      
-                      var strArr  = str.split("%")
-                      strArr.map((l,i)=>{
-                       strArr[i]=l.replace('u','')
-                       strArr[i]=strArr[i].toLowerCase()
-                       strArr[i]='0x' + strArr[i]
-                      })
-                      strArr.map((l,i)=>{
-                       if(l!='0x'){ 
-                       realSum+=trFontlist.indexOf(l);
-                       }
-                      })
-                     
+                    if (isPerson) {
+                      var realSum = "";
+                      var str = uniencode(sum);
+                      var str111 = uniencode("                            ");
+
+                      var strArr = str.split("%");
+                      strArr.map((l, i) => {
+                        strArr[i] = l.replace("u", "");
+                        strArr[i] = strArr[i].toLowerCase();
+                        strArr[i] = "0x" + strArr[i];
+                      });
+                      strArr.map((l, i) => {
+                        if (l != "0x") {
+                          realSum += trFontlist.indexOf(l);
+                        }
+                      });
+
                       insert(
-                      url,
-                      title,
-                      realSum,
-                      villageName,
-                      area,
-                      isPerson,
-                      postTime,
-                      location,
-                      cm,
-                      huxing
-                    );
-                    console.log('房价字体已经过转换:'+sum+'==>'+realSum);
-                    }else{
+                        url,
+                        title,
+                        realSum,
+                        villageName,
+                        area,
+                        isPerson,
+                        postTime,
+                        location,
+                        cm,
+                        huxing
+                      );
+                      console.log(
+                        "房价字体已经过转换:" + sum + "==>" + realSum
+                      );
+                    } else {
                       insert(
-                      url,
-                      title,
-                      sum,
-                      villageName,
-                      area,
-                      isPerson,
-                      postTime,
-                      location,
-                      cm,
-                      huxing
-                    );
+                        url,
+                        title,
+                        sum,
+                        villageName,
+                        area,
+                        isPerson,
+                        postTime,
+                        location,
+                        cm,
+                        huxing
+                      );
                     }
-                  
                   });
-                  
               });
               pageNum++;
               if (pageNum <= targetNum) {
