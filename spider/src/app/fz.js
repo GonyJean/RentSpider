@@ -312,7 +312,7 @@ async function getInfo(Num) {
                       cm,
                       huxing
                     );
-                    console.log('该字体已经过转换:'+sum+'==>'+realSum);
+                    console.log('房价字体已经过转换:'+sum+'==>'+realSum);
                     }else{
                       insert(
                       url,
