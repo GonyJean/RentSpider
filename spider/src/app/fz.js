@@ -22,7 +22,7 @@ var exec = require("child_process").exec;
 // import fonttools from 'fonttools';
 import { base64Font, XMLDate } from "../../until/fontTransform";
 import { baseReg } from "../../until/reg";
-import { str2utf8, uniencode,decodeUnicode } from "../../until/common";
+import { str2utf8, uniencode, decodeUnicode } from "../../until/common";
 requestProxy(superagent);
 charset(superagent);
 var dataBuffer = new Buffer(base64Font, "base64");
@@ -38,7 +38,9 @@ function insert(
   title,
   sum,
   villageName,
+  road,
   area,
+  payWay,
   isPerson,
   postTime,
   location,
@@ -50,7 +52,9 @@ function insert(
     title,
     sum,
     villageName,
+    road,
     area,
+    payWay,
     isPerson,
     postTime,
     location,
@@ -68,7 +72,7 @@ function insert(
 async function getIp() {
   var obj1 = {};
   try {
-    const result = await superagent.get("http://127.0.0.1:3000/getIp");
+    const result = await superagent.get("http://www.66ip.cn/nmtq.php?getnum=1&isp=0&anonymoustype=3&start=&ports=&export=&ipaddress=&area=1&proxytype=1&api=66ip");
     const obj = {};
     console.log("result.headers:" + result.headers);
     var arr = eval(result.res.text);
@@ -96,15 +100,15 @@ async function getIp() {
   // });
 }
 async function getInfo(Num) {
-  // var obj = await getIp()
+  var obj = await getIp()
   let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-  // var ip = "http://" + obj.ip + ":" + obj.port;
-  // if (obj.ip) console.log('代理获取成功:'+ip+',\n现在开始爬取信息...');
+  var ip = "http://" + obj.ip + ":" + obj.port;
+  if (obj.ip) console.log('代理获取成功:'+ip+',\n现在开始爬取信息...');
 
   superagent
     .get(baseUrl + "chuzu" + "/pn" + Num) //这里设置编码
     .set({ "User-Agent": userAgent })
-    // .proxy(ip)
+    .proxy(ip)
     .end(function(err, res) {
       if (err) {
         console.log("抓取第" + Num + "页信息的时候出错了,错误信息:" + err);
@@ -199,9 +203,9 @@ async function getInfo(Num) {
                       trFontlist[curIndex] = n.$.code;
                   });
                 });
-                trFontlist.map((l,i)=>{
-                       trFontlist[i]=trFontlist[i].replace('0x','u')
-                      })
+                trFontlist.map((l, i) => {
+                  trFontlist[i] = trFontlist[i].replace("0x", "u");
+                });
               });
 
               console.log(trFontlist);
@@ -218,14 +222,15 @@ async function getInfo(Num) {
                 //   postTime:'',
                 //   url: ""
                 // };
-                var url = $(this)
-                  .find(".des h2 a")
-                  .attr("href");
+                var url =
+                  $(this)
+                    .find(".des h2 a")
+                    .attr("href");
                 var title = $(this)
                   .find(".des h2 a")
                   .text()
                   .replace(/[\r\n&#x\s+]/g, "");
-                
+
                 var sum = $(this)
                   .find(".money .strongbox")
                   .text()
@@ -242,12 +247,14 @@ async function getInfo(Num) {
                   .find("a")
                   .eq(1)
                   .text(); //  小区名称
-                var area = $(this)
+                var road = $(this)
                   .find(".add")
                   .find("a")
                   .eq(0)
                   .text()
                   .replace(/[\r\n\s+]/g, ""); // 路
+                var area; // 地区
+                var payWay; // 支付方式
                 var isPerson =
                   $(this)
                     .find(".geren")
@@ -257,126 +264,187 @@ async function getInfo(Num) {
                     : 0; // 地址
                 var postTime = moment().format("L");
                 var location = { lng: "", lat: "" };
-                superagent
-                  .get(
-                    encodeURI(
-                      "http://api.map.baidu.com/geocoder/v2/?address=" +
-                        "乌鲁木齐市" +
-                        area +
-                        "&output=XML&ak=" +
-                        baiduAK +
-                        "&callback=showLocation"
-                    )
-                  )
-                  .end(function(err, res) {
-                    if (err) {
-                      console.log("抓取第" + Num + "页信息的时候出错了");
-                      return next(err);
-                    }
-                    var parser = new xml2js.Parser();
-                    parser.parseString(res.text, function(err, result) {
-                      location.lat =
-                        result.GeocoderSearchResponse.result[0].location[0].lat[0];
-                      location.lng =
-                        result.GeocoderSearchResponse.result[0].location[0].lng[0];
-                    });
+                if(url)
+                {superagent
+                  .get('https:'+url)
+                  .set({ "User-Agent": userAgent })
+                  .end((err, res) => {
+                    var $ = cheerio.load(res.text);
+                    area = $("ul.f14")
+                      .eq(0)
+                      .find("li")
+                      .eq(-2)
+                      .find("span")
+                      .eq(1)
+                      .find("a")
+                      .eq(0)
+                      .text();
+                    payWay = $(".house-pay-way.f16")
+                      .find("span")
+                      .eq(1)
+                      .text();
 
-                    if (isPerson&&url) {
-                      var realSum = "";
-                      var realTitle="";
-                      var realCm="";
-                      var realHuxing=""
-                      var str = uniencode(sum);
-                      var strTitle = uniencode(title);
-                      var strCm = uniencode(cm);
-                      var strHuxing = uniencode(huxing);
-                      var strArr = str.split("%");
-                      var titleArr = strTitle.split("%");
-                      var cmArr = strCm.split("%");
-                      var huxingArr = strHuxing.split("%");
-                      strArr.map((l, i) => {
-                        strArr[i] = strArr[i].toLowerCase();
-                        strArr[i] = strArr[i];
-                      });
-                      strArr.map((l, i) => {
-                        if (l != "") {
-                          realSum += trFontlist.indexOf(l);
+                    superagent
+                      .get(
+                        encodeURI(
+                          "http://api.map.baidu.com/geocoder/v2/?address=" +
+                            "乌鲁木齐市" +
+                            area +
+                            "&output=XML&ak=" +
+                            baiduAK +
+                            "&callback=showLocation"
+                        )
+                      )
+                      .end(function(err, res) {
+                        if (err) {
+                          console.log("抓取第" + Num + "页信息的时候出错了");
+                          return next(err);
                         }
-                      });
-                      titleArr.map((l, i) => {
-                        var curL = trFontlist.indexOf(l.toLowerCase())==-1?false:true;
-                        // 是字体文件
-                        if(curL){
-                         realTitle+=trFontlist.indexOf(titleArr[i].toLowerCase())
-                        }
-                        // 不是字体文件
-                        else if (l != ""&&trFontlist.indexOf(titleArr[i].toLowerCase())==-1) {
-                            realTitle+=decodeUnicode('\\'+l)
-                        }
-                      });
-                      cmArr.map((l, i) => {
-                        var curL = trFontlist.indexOf(l.toLowerCase())==-1?false:true;
-                        // 是字体文件
-                        if(curL){
-                         realCm+=trFontlist.indexOf(cmArr[i].toLowerCase())
-                        }
-                        // 不是字体文件
-                        else if (l != ""&&trFontlist.indexOf(cmArr[i].toLowerCase())==-1) {
-                            realCm+=decodeUnicode('\\'+l)
-                        }
-                      });
-                      huxingArr.map((l, i) => {
-                        var curL = trFontlist.indexOf(l.toLowerCase())==-1?false:true;
-                        // 是字体文件
-                        if(curL){
-                         realHuxing+=trFontlist.indexOf(huxingArr[i].toLowerCase())
-                        }
-                        // 不是字体文件
-                        else if (l != ""&&trFontlist.indexOf(huxingArr[i].toLowerCase())==-1) {
-                            realHuxing+=decodeUnicode('\\'+l)
-                        }
-                      });
-                      
+                        var parser = new xml2js.Parser();
+                        parser.parseString(res.text, function(err, result) {
+                          location.lat =
+                            result.GeocoderSearchResponse.result[0].location[0].lat[0];
+                          location.lng =
+                            result.GeocoderSearchResponse.result[0].location[0].lng[0];
+                        });
 
-                      insert(
-                        url,
-                        realTitle,
-                        realSum,
-                        villageName,
-                        area,
-                        isPerson,
-                        postTime,
-                        location,
-                        realCm,
-                        realHuxing
-                      );
-                      console.log(
-                        "房价字体已经过转换:" + sum + "==>" + realSum+'\n'
-                      + "标题字体已转换:"+title+ "==>" + realTitle + "\n"
-                      + "户型字体已转换:"+huxing+ "==>" + realHuxing + "\n"
-                      );
-                    } 
-                    else  if(!isPerson&&url){
-                      insert(
-                        url,
-                        title,
-                        sum,
-                        villageName,
-                        area,
-                        isPerson,
-                        postTime,
-                        location,
-                        cm,
-                        huxing
-                      );
-                    }
-                    
+                        if (isPerson && url) {
+                          var realSum = "";
+                          var realTitle = "";
+                          var realCm = "";
+                          var realHuxing = "";
+                          var str = uniencode(sum);
+                          var strTitle = uniencode(title);
+                          var strCm = uniencode(cm);
+                          var strHuxing = uniencode(huxing);
+                          var strArr = str.split("%");
+                          var titleArr = strTitle.split("%");
+                          var cmArr = strCm.split("%");
+                          var huxingArr = strHuxing.split("%");
+                          strArr.map((l, i) => {
+                            strArr[i] = strArr[i].toLowerCase();
+                            strArr[i] = strArr[i];
+                          });
+                          strArr.map((l, i) => {
+                            if (l != "") {
+                              realSum += trFontlist.indexOf(l);
+                            }
+                          });
+                          titleArr.map((l, i) => {
+                            var curL =
+                              trFontlist.indexOf(l.toLowerCase()) == -1
+                                ? false
+                                : true;
+                            // 是字体文件
+                            if (curL) {
+                              realTitle += trFontlist.indexOf(
+                                titleArr[i].toLowerCase()
+                              );
+                            }
+                            // 不是字体文件
+                            else if (
+                              l != "" &&
+                              trFontlist.indexOf(titleArr[i].toLowerCase()) ==
+                                -1
+                            ) {
+                              realTitle += decodeUnicode("\\" + l);
+                            }
+                          });
+                          cmArr.map((l, i) => {
+                            var curL =
+                              trFontlist.indexOf(l.toLowerCase()) == -1
+                                ? false
+                                : true;
+                            // 是字体文件
+                            if (curL) {
+                              realCm += trFontlist.indexOf(
+                                cmArr[i].toLowerCase()
+                              );
+                            }
+                            // 不是字体文件
+                            else if (
+                              l != "" &&
+                              trFontlist.indexOf(cmArr[i].toLowerCase()) == -1
+                            ) {
+                              realCm += decodeUnicode("\\" + l);
+                            }
+                          });
+                          huxingArr.map((l, i) => {
+                            var curL =
+                              trFontlist.indexOf(l.toLowerCase()) == -1
+                                ? false
+                                : true;
+                            // 是字体文件
+                            if (curL) {
+                              realHuxing += trFontlist.indexOf(
+                                huxingArr[i].toLowerCase()
+                              );
+                            }
+                            // 不是字体文件
+                            else if (
+                              l != "" &&
+                              trFontlist.indexOf(huxingArr[i].toLowerCase()) ==
+                                -1
+                            ) {
+                              realHuxing += decodeUnicode("\\" + l);
+                            }
+                          });
+
+                          insert(
+                            url,
+                            realTitle,
+                            realSum,
+                            villageName,
+                            road,
+                            area,
+                            payWay,
+                            isPerson,
+                            postTime,
+                            location,
+                            realCm,
+                            realHuxing
+                          );
+                          console.log(
+                            "房价字体已经过转换:" +
+                              sum +
+                              "==>" +
+                              realSum +
+                              "\n" +
+                              "标题字体已转换:" +
+                              title +
+                              "==>" +
+                              realTitle +
+                              "\n" +
+                              "户型字体已转换:" +
+                              huxing +
+                              "==>" +
+                              realHuxing +
+                              "\n"
+                          );
+                        } else if (!isPerson && url) {
+                          insert(
+                            url,
+                            title,
+                            sum,
+                            villageName,
+                            road,
+                            area,
+                            payWay,
+                            isPerson,
+                            postTime,
+                            location,
+                            cm,
+                            huxing
+                          );
+                        }
+                      });
                   });
+                }
               });
               pageNum++;
               if (pageNum <= targetNum) {
                 console.log("第" + pageNum + "页抓取结束");
-                setTimeout(getInfo, 2500, pageNum);
+                setTimeout(getInfo, 6050, pageNum);
               } else {
                 console.log("获取结束");
                 return;
