@@ -17,35 +17,31 @@ var xml2js = require("xml2js");
 // var ep = eventproxy();
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8";
 var pageNum = 1;
-var targetNum = 100;
+var targetNum = 400;
 var baseUrl = "http://www.xicidaili.com/"; //信息
-var type = 'nn'  // nt:国内透明  nn:国内高匿
+var type = "nn"; // nt:国内透明  nn:国内高匿
 moment.locale("zh-cn");
 
-function insert(
-ip,
-              port,
-              alive,
-              postTime
-) {
-   var info = new xiciInfo({
-   ip,
-              port,
-              alive,
-              postTime
+function insert(ip, port,alive,type,postTime) {
+  var info = new xiciInfo({
+    ip,
+    port,
+    alive,
+    type,
+    postTime
   });
   info.save(function(err, res) {
-          if (err) {
-            console.log("Error:" + err);
-          } else {
-            // console.log("Res:" + res);
-          }
-        });
+    if (err) {
+      console.log("Error:" + err);
+    } else {
+      // console.log("Res:" + res);
+    }
+  });
 }
 
 function getInfo(Num) {
   superagent
-    .get(baseUrl + type+'/'+Num) //这里设置编码
+    .get(baseUrl + type + "/" + Num) //这里设置编码
     .set("User-Agent", "Baiduspider")
     .end(function(err, res) {
       if (err) {
@@ -54,8 +50,8 @@ function getInfo(Num) {
       }
 
       var $ = cheerio.load(res.text);
-      var list = $("#ip_list")
-      var ipContent = $("#ip_list tbody tr")
+      var list = $("#ip_list");
+      var ipContent = $("#ip_list tbody tr");
       var ipList = $("#ip_list tbody tr  td:nth-child(2)");
       var portList = $("#ip_list tbody tr  td:nth-child(3)");
 
@@ -66,27 +62,28 @@ function getInfo(Num) {
         //   title: "",
         //   sum: "",
         //   unit:"",
-        var ip = $(this).find('td:nth-child(2)').text()
-        var port = $(this).find('td:nth-child(3)').text()
-        var alive = $(this).find('td:nth-child(9)').text()
+        var ip = $(this)
+          .find("td:nth-child(2)")
+          .text();
+        var port = $(this)
+          .find("td:nth-child(3)")
+          .text();
+        var alive = $(this)
+          .find("td:nth-child(9)")
+          .text();
+        var type = $(this)
+          .find("td:nth-child(6)")
+          .text();
         var postTime = moment().format("L");
-        if(ip!==''&&port!==''&&alive!==''){
-
+        if (ip !== "" && port !== "" && alive !== "") {
+        insert(ip, port,alive,type,postTime);
         }
-          insert(
-              ip,
-              port,
-              alive,
-              postTime
-            )
       });
       pageNum++;
       if (pageNum <= targetNum) {
         console.log("第" + pageNum + "页抓取结束");
-        setTimeout(getInfo, 500, pageNum);
-
+        setTimeout(getInfo, 50, pageNum);
       } else {
-        
         console.log();
         return;
       }

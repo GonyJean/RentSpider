@@ -73,23 +73,29 @@ async function insert(
 async function getIp() {
   var obj1 = {};
   try {
-    const result = await superagent.get(
-      "http://www.66ip.cn/nmtq.php?getnum=1&isp=0&anonymoustype=3&start=&ports=&export=&ipaddress=&area=0&proxytype=1&api=66ip"
-      //
+    // const result = await superagent.get(
+    //   "http://www.66ip.cn/nmtq.php?getnum=1&isp=0&anonymoustype=3&start=&ports=&export=&ipaddress=&area=0&proxytype=1&api=66ip"
+    //   //
+    // );
+    // const obj = {};
+    // console.log("result.headers:" + result.headers);
+
+    // var pattIp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\:([0-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-5]{2}[0-3][0-5])$/;
+    // var $ = cheerio.load(result.text);
+    // var html = $("</div>").html(result.text)[0];
+    // var ipAdress = html.childNodes[0].childNodes[1].childNodes[0].data;
+    // // obj.ip = arr[0].ip;
+    // // obj.port = arr[0].port;
+    // obj1 = ipAdress;
+
+
+     const result = await superagent.get(
+      "http://127.0.0.1:3000/getIP"
     );
-    const obj = {};
-    console.log("result.headers:" + result.headers);
-
-    var pattIp = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\:([0-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-5]{2}[0-3][0-5])$/;
-    var $ = cheerio.load(result.text);
-    var html = $("</div>").html(result.text)[0];
-    var ipAdress = html.childNodes[0].childNodes[1].childNodes[0].data;
-    // obj.ip = arr[0].ip;
-    // obj.port = arr[0].port;
-    obj1 = ipAdress;
+     console.log("result.headers:" + JSON.parse(result.text));
+     var ipAdress = JSON.parse(result.text)[0].ip+':'+JSON.parse(result.text)[0].port ;
     console.log("正在获取IP: " + ipAdress);
-
-    return obj1;
+    return ipAdress;
   } catch (error) {
     console.error(error);
   }
@@ -129,7 +135,7 @@ async function getInfo(Num) {
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
     })
     .proxy(ip)
-    .timeout({ response: 5000, deadline: 60000 })
+    .timeout({ response: 3000, deadline: 60000 })
     .end(function(err, res) {
       if (err) {
         console.log("抓取第" + pageNum + "页信息的时候出错了,错误信息:" + err);

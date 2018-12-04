@@ -38,7 +38,7 @@
     "arf": "nodemon src/app.js --exec babel-node --config package.json",
     "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
     "start": "npm run build && node dist/index.js",
-    "debug": "babel-node src/app/fz.js  --inspect --debug-brk --nolazy src/app/fz.js"
+    "debug": "babel-node src/app/ipCheck.js  --inspect --debug-brk --nolazy src/app/ipCheck.js"
   },
   "author": "",
   "license": "ISC"
