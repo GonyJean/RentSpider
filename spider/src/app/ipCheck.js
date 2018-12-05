@@ -35,7 +35,7 @@ async function checkIp() {
     console.log("result.headers:" + JSON.parse(result.text));
     //  var ipAdress = JSON.parse(result.text)[0].ip+':'+JSON.parse(result.text)[0].port ;
     var ipAdress = JSON.parse(result.text);
-    console.log("正在获取IP列表: " + ipAdress);
+    // console.log("正在获取IP列表: " + ipAdress);
     return ipAdress;
   } catch (error) {
     console.error(error);
@@ -51,11 +51,11 @@ function insert(obj, type) {
 
 async function getInfo() {
   var objArr = await checkIp();
-  async.mapLimit(objArr,10, function(obj, callback) {
+  async.mapLimit(objArr,20, function(obj, callback) {
     let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
     var ip = "http://" + obj.ip+':'+obj.port;
     superagent
-      .get("http://www.baidu.com") //这里设置编码
+      .get("https://www.baidu.com") //这里设置编码
       .set({ "User-Agent": userAgent })
       .proxy(ip)
       .timeout({ response: 2000, deadline: 60000 })
@@ -68,12 +68,16 @@ async function getInfo() {
             "ip:  " + ip + "无效,继续抓取!",
             "\n错误信息:" +
               err +
+               "\n当前有效IP:" +
+              successNum +
+              "个" +
               "\n当前无效IP:" +
               curErrNum +
               "个" +
+             
               "\n当前总共检查IP:" +
               curNum +
-              "个"
+              "个\n=================================================="
           );
 
           insert(curip, 0);
@@ -96,13 +100,16 @@ async function getInfo() {
         console.log("====================================");
         insert(curip, 1);
         callback(null,true);
-        if (curNum >= targetNum) {
-          console.log("抓取目标:" + targetNum + "个,结束!");
-          return;
-        }
+       
       });
   },(error,results)=>{
-      getInfo()
+      
+       if (successNum >= targetNum) {
+          console.log("抓取目标:" + targetNum + "个,结束!");
+          return;
+        }else{
+          getInfo()
+        }
   });
 }
 

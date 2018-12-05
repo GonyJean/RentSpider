@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-import { getIp } from "../controller";
+import { getIp,getSuccessIp } from "../controller";
 
 //定义一个get请求 path为根目录
 
@@ -29,6 +29,11 @@ router.get("/getIP", function(req, res) {
   var whereStr = "ip";
   var data = [];
   getIp(res);
+});
+router.get("/getSuccessIp", function(req, res) {
+  // 默认返回的json 对象
+  
+  getSuccessIp(res);
 });
 
 export default router;

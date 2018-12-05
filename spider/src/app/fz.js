@@ -90,7 +90,7 @@ async function getIp() {
 
 
      const result = await superagent.get(
-      "http://127.0.0.1:3000/getIP"
+      "http://127.0.0.1:3000/getSuccessIp"
     );
      console.log("result.headers:" + JSON.parse(result.text));
      var ipAdress = JSON.parse(result.text)[0].ip+':'+JSON.parse(result.text)[0].port ;
@@ -117,7 +117,7 @@ async function getIp() {
 async function getInfo(Num) {
   var obj = await getIp();
   let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-  var ip ="http://" + obj;
+  var ip ="https://" + obj;
   
   if (obj) {
     console.log("代理获取成功:" + ip + ",\n现在开始爬取信息...");

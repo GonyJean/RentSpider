@@ -57,7 +57,7 @@ var getIp = function () {
             obj1 = {};
             _context2.prev = 1;
             _context2.next = 4;
-            return superagent.get("http://127.0.0.1:3000/getIP");
+            return superagent.get("http://127.0.0.1:3000/getSuccessIp");
 
           case 4:
             result = _context2.sent;
@@ -100,7 +100,7 @@ var getInfo = function () {
           case 2:
             obj = _context3.sent;
             userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-            ip = "http://" + obj;
+            ip = "https://" + obj;
 
             if (!obj) {
               _context3.next = 9;

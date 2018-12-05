@@ -38,5 +38,10 @@ router.get("/getIP", function (req, res) {
   var data = [];
   (0, _controller.getIp)(res);
 });
+router.get("/getSuccessIp", function (req, res) {
+  // 默认返回的json 对象
+
+  (0, _controller.getSuccessIp)(res);
+});
 
 exports.default = router;
