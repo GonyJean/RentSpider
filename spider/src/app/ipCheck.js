@@ -51,14 +51,14 @@ function insert(obj, type) {
 
 async function getInfo() {
   var objArr = await checkIp();
-  async.mapLimit(objArr,20, function(obj, callback) {
+  async.mapLimit(objArr,50, function(obj, callback) {
     let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
     var ip = "http://" + obj.ip+':'+obj.port;
     superagent
       .get("https://www.baidu.com") //这里设置编码
       .set({ "User-Agent": userAgent })
       .proxy(ip)
-      .timeout({ response: 2000, deadline: 60000 })
+      .timeout({ response: 4000, deadline: 60000 })
       .end(function(err, res) {
         var curip = obj.ip;
         if (err) {

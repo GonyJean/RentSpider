@@ -16,7 +16,7 @@ var fs = require("fs");
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8"; // 这里自行申请百度API 做地图经纬度转换用的
 var pageNum = 1;
 var targetNum = 100;
-var baseUrl = "http://xj.58.com/"; //地区url 自行修改
+var baseUrl = "https://xj.58.com/"; //地区url 自行修改
 var userAgents = require("../../until/userAgent"); //浏览器头
 var exec = require("child_process").exec;
 // import fonttools from 'fonttools';
@@ -115,17 +115,17 @@ async function getIp() {
   // });
 }
 async function getInfo(Num) {
-  var obj = await getIp();
+  // var obj = await getIp();
   let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-  var ip ="https://" + obj;
+  // var ip ="https://" + obj;
   
-  if (obj) {
-    console.log("代理获取成功:" + ip + ",\n现在开始爬取信息...");
-  } else {
-    console.log("代理获取失败:" + ip + "!!!!,正在重新获取IP...");
-    getInfo(pageNum);
-    return;
-  }
+  // if (obj) {
+  //   console.log("代理获取成功:" + ip + ",\n现在开始爬取信息...");
+  // } else {
+  //   console.log("代理获取失败:" + ip + "!!!!,正在重新获取IP...");
+  //   getInfo(pageNum);
+  //   return;
+  // }
 
   superagent
     .get(baseUrl + "chuzu" + "/pn" + pageNum) //这里设置编码
@@ -134,7 +134,7 @@ async function getInfo(Num) {
       Accept:
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
     })
-    .proxy(ip)
+    // .proxy(ip)
     .timeout({ response: 3000, deadline: 60000 })
     .end(function(err, res) {
       if (err) {
@@ -297,7 +297,7 @@ async function getInfo(Num) {
                         Accept:
                           "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
                       })
-                      .proxy(ip)
+                      // .proxy(ip)
                       .timeout({ response: 5000, deadline: 60000 })
                       .end((err, res) => {
                         if (err) {
