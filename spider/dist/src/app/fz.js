@@ -89,39 +89,29 @@ var getIp = function () {
 
 var getInfo = function () {
   var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3(Num) {
-    var obj, userAgent, ip;
+    var userAgent;
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            _context3.next = 2;
-            return getIp();
-
-          case 2:
-            obj = _context3.sent;
+            // var obj = await getIp();
             userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-            ip = "https://" + obj;
+            // var ip ="https://" + obj;
 
-            if (!obj) {
-              _context3.next = 9;
-              break;
-            }
-
-            console.log("代理获取成功:" + ip + ",\n现在开始爬取信息...");
-            _context3.next = 12;
-            break;
-
-          case 9:
-            console.log("代理获取失败:" + ip + "!!!!,正在重新获取IP...");
-            getInfo(pageNum);
-            return _context3.abrupt("return");
-
-          case 12:
+            // if (obj) {
+            //   console.log("代理获取成功:" + ip + ",\n现在开始爬取信息...");
+            // } else {
+            //   console.log("代理获取失败:" + ip + "!!!!,正在重新获取IP...");
+            //   getInfo(pageNum);
+            //   return;
+            // }
 
             superagent.get(baseUrl + "chuzu" + "/pn" + pageNum) //这里设置编码
             .set({ "User-Agent": userAgent }).set({
               Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-            }).proxy(ip).timeout({ response: 3000, deadline: 60000 }).end(function (err, res) {
+            })
+            // .proxy(ip)
+            .timeout({ response: 3000, deadline: 60000 }).end(function (err, res) {
               if (err) {
                 console.log("抓取第" + pageNum + "页信息的时候出错了,错误信息:" + err);
                 getInfo(pageNum);
@@ -250,7 +240,9 @@ var getInfo = function () {
                           if (url) {
                             superagent.get("https:" + url).set({ "User-Agent": userAgent }).set({
                               Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-                            }).proxy(ip).timeout({ response: 5000, deadline: 60000 }).end(function (err, res) {
+                            })
+                            // .proxy(ip)
+                            .timeout({ response: 5000, deadline: 60000 }).end(function (err, res) {
                               if (err) {
                                 console.log("抓取第" + pageNum + "页[详情]信息的时候出错了,错误信息:" + err);
                                 getInfo(pageNum);
@@ -361,7 +353,7 @@ var getInfo = function () {
               }
             });
 
-          case 13:
+          case 2:
           case "end":
             return _context3.stop();
         }
@@ -402,7 +394,7 @@ var fs = require("fs");
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8"; // 这里自行申请百度API 做地图经纬度转换用的
 var pageNum = 1;
 var targetNum = 100;
-var baseUrl = "http://xj.58.com/"; //地区url 自行修改
+var baseUrl = "https://xj.58.com/"; //地区url 自行修改
 var userAgents = require("../../until/userAgent"); //浏览器头
 var exec = require("child_process").exec;
 // import fonttools from 'fonttools';

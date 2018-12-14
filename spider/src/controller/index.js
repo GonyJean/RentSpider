@@ -12,7 +12,6 @@ export function getIp(res) {
      } },
     { $sample: { size: 50 } }
   ]).exec(function(err, data) {
-    // console.log(data);
     res.send(JSON.stringify(data));
   });
 }

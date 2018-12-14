@@ -22,7 +22,7 @@ var pageNum = 1;
 var curNum = 0;
 var curErrNum = 0;
 var successNum = 0;
-var targetNum = 200;
+var targetNum = 2000;
 var baseUrl = "http://www.xicidaili.com/"; //信息
 var type = "nn"; // nt:国内透明  nn:国内高匿
 requestProxy(superagent);
@@ -51,7 +51,7 @@ function insert(obj, type) {
 
 async function getInfo() {
   var objArr = await checkIp();
-  async.mapLimit(objArr,50, function(obj, callback) {
+  async.mapLimit(objArr,15, function(obj, callback) {
     let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
     var ip = "http://" + obj.ip+':'+obj.port;
     superagent
@@ -105,11 +105,13 @@ async function getInfo() {
   },(error,results)=>{
       
        if (successNum >= targetNum) {
-          console.log("抓取目标:" + targetNum + "个,结束!");
-          return;
-        }else{
-          getInfo()
-        }
+         console.log('有效目标:'+targetNum+'到了! 结束检查');
+         return
+       }
+          console.log("抓取目标:" + successNum + "个,开始下一轮!");
+          getInfo();
+         
+      
   });
 }
 
