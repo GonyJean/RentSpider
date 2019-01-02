@@ -12,14 +12,13 @@ export function getIp(res) {
      } },
     { $sample: { size: 50 } }
   ]).exec(function(err, data) {
-    // console.log(data);
     res.send(JSON.stringify(data));
   });
 }
 
 export function getSuccessIp(res) {
   XC.aggregate([
-    { $match: { eff: "1", type: "HTTPS" } },
+    { $match: { eff: "3"}},
     { $sample: { size: 1 } }
   ]).exec(function(err, data) {
     res.send(JSON.stringify(data));

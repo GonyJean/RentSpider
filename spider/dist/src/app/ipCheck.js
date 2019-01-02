@@ -58,16 +58,16 @@ var getInfo = function () {
           case 2:
             objArr = _context2.sent;
 
-            async.mapLimit(objArr, 10, function (obj, callback) {
+            async.mapLimit(objArr, 15, function (obj, callback) {
               var userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-              var ip = "http://" + obj.ip + ':' + obj.port;
-              superagent.get("https://www.baidu.com") //这里设置编码
-              .set({ "User-Agent": userAgent }).proxy(ip).timeout({ response: 2000, deadline: 60000 }).end(function (err, res) {
+              var ip = "http://" + obj.ip + ":" + obj.port;
+              superagent.get("https://xj.58.com") //这里设置编码
+              .set({ "User-Agent": userAgent }).proxy(ip).timeout({ response: 4000, deadline: 60000 }).end(function (err, res) {
                 var curip = obj.ip;
                 if (err) {
                   curNum++;
                   curErrNum++;
-                  console.log("ip:  " + ip + "无效,继续抓取!", "\n错误信息:" + err + "\n当前有效IP:" + successNum + "个" + "\n当前无效IP:" + curErrNum + "个" + "\n当前总共检查IP:" + curNum + "个\n==================================================");
+                  console.log("ip:  " + ip + "无效,继续抓取!", "\n错误信息:" + err + "\n当前有效IP:" + successNum + "个" + "\n当前无效IP:" + curErrNum + "个" + "\n当前总共检查IP:" + curNum + "个\n" + "ip存活率:" + _common.Common.toPercent(successNum / curNum) + "\n==================================================");
 
                   insert(curip, 0);
                   callback(null);
@@ -77,19 +77,18 @@ var getInfo = function () {
                 curNum++;
                 successNum++;
                 console.log("====================================");
-                console.log("检测到有效IP,地址是: " + ip + "\n当前有效IP数量: " + successNum + "\n当前总共检查IP:" + curNum + "个");
+                console.log("检测到有效IP,地址是: " + ip + "\n当前有效IP数量: " + successNum + "\n当前总共检查IP:" + curNum + "个\n" + "ip存活率:" + _common.Common.toPercent(successNum / curNum));
                 console.log("====================================");
-                insert(curip, 1);
+                insert(curip, 3);
                 callback(null, true);
               });
             }, function (error, results) {
-
               if (successNum >= targetNum) {
-                console.log("抓取目标:" + targetNum + "个,结束!");
+                console.log("有效目标:" + targetNum + "到了! 结束检查");
                 return;
-              } else {
-                getInfo();
               }
+              console.log("抓取目标:" + successNum + "个,开始下一轮!");
+              getInfo();
             });
 
           case 4:
@@ -104,6 +103,8 @@ var getInfo = function () {
     return _ref2.apply(this, arguments);
   };
 }();
+
+var _common = require("../until/common");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -126,6 +127,7 @@ var xiciInfo = require("../../schema/xc.js");
 var request = require("request");
 var xml2js = require("xml2js");
 var userAgents = require("../../until/userAgent"); //浏览器头
+
 // var eventproxy = require('eventproxy');  //流程控制
 // var ep = eventproxy();
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8";
@@ -133,7 +135,7 @@ var pageNum = 1;
 var curNum = 0;
 var curErrNum = 0;
 var successNum = 0;
-var targetNum = 200;
+var targetNum = 2000;
 var baseUrl = "http://www.xicidaili.com/"; //信息
 var type = "nn"; // nt:国内透明  nn:国内高匿
 requestProxy(superagent);
@@ -141,11 +143,30 @@ charset(superagent);
 moment.locale("zh-cn");
 
 function insert(obj, type) {
-  xiciInfo.update({ ip: obj }, { eff: type }).exec(function (err, data) {
-    if (err) {
-      console.log(err);
-    }
-  });
+  if (!type) {
+    xiciInfo.deleteMany({ 'ip': obj, 'eff': type }).exec(function (err, data) {
+
+      if (err) {
+        console.log(err);
+      }
+      console.log('删除了标识为0的记录:' + obj);
+    });
+    xiciInfo.deleteMany({ 'ip': obj, 'eff': { $exists: false } }).exec(function (err, data) {
+
+      if (err) {
+        console.log(err);
+      }
+      console.log(data);
+    });
+    console.log('删除了不存在exists标识的记录:' + obj);
+  } else {
+    xiciInfo.update({ 'ip': obj }, { $set: { 'eff': type } }).exec(function (err, data) {
+      if (err) {
+        console.log(err);
+      }
+      console.log('将ip:' + obj + '的eff更新为了' + type);
+    });
+  }
 }
 
 getInfo();
