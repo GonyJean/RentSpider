@@ -13,9 +13,9 @@
 2018年11月6日 完成字体转换,抓取数据新增了户型和面积,个人房源暂未做转换后面有时间再弄  
 2018年12月 开始着重维护ip池 目前完成了ip抓取 ip筛选。现在ip源来自国外，质量比较高。
 
-![1](D:\spider\RentSpider\img\1.png)  
+![1](https://github.com/RentSpider/RentSpider/blob/master/img/1.png?raw=true)  
 
-![2](D:\spider\RentSpider\img\2.png)
+![2](https://github.com/RentSpider/RentSpider/blob/master/img/2.png?raw=true)
 
 ## 前端
 最终决定用React来做了
