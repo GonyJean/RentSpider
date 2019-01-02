@@ -4,96 +4,6 @@ var _regenerator = require("babel-runtime/regenerator");
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
 
-var getIp = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-    var obj1, result, obj;
-    return _regenerator2.default.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            obj1 = {};
-            _context.prev = 1;
-            _context.next = 4;
-            return superagent.get("http://127.0.0.1:3000/getSuccessIp");
-
-          case 4:
-            result = _context.sent;
-
-            console.log("result.headers:" + JSON.parse(result.text));
-            obj = {};
-
-            obj["ip"] = JSON.parse(result.text)[0].ip;
-            obj["port"] = JSON.parse(result.text)[0].port;
-            console.log("正在获取IP: " + obj["ip"]);
-            return _context.abrupt("return", obj);
-
-          case 13:
-            _context.prev = 13;
-            _context.t0 = _context["catch"](1);
-
-            console.error(_context.t0);
-
-          case 16:
-          case "end":
-            return _context.stop();
-        }
-      }
-    }, _callee, this, [[1, 13]]);
-  }));
-
-  return function getIp() {
-    return _ref.apply(this, arguments);
-  };
-}();
-
-var getCountryList = function () {
-  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
-    var obj, ip;
-    return _regenerator2.default.wrap(function _callee3$(_context3) {
-      while (1) {
-        switch (_context3.prev = _context3.next) {
-          case 0:
-            _context3.next = 2;
-            return getIp();
-
-          case 2:
-            obj = _context3.sent;
-            ip = "http://" + obj.ip + ":" + obj.port;
-
-            superagent.get("http://spys.one/en/proxy-by-country/") //这里设置编码
-            .proxy(ip).end(function (err, res) {
-              if (err) {
-                console.log("抓取spys.one信息的时候出错了");
-                getCountryList();
-                return;
-              }
-              var $ = cheerio.load(res.text);
-              var list = $("td[colspan=10]").first().find("tbody").first().find("tr").find("a");
-
-              list.each(function (i, l) {
-                if (i > 3) {
-                  var str = $(this).attr("href");
-                  countryUrlList.push(str);
-                }
-                if (i >= list.length - 1) {
-                  getCountryProxy(ip);
-                }
-              });
-            });
-
-          case 5:
-          case "end":
-            return _context3.stop();
-        }
-      }
-    }, _callee3, this);
-  }));
-
-  return function getCountryList() {
-    return _ref3.apply(this, arguments);
-  };
-}();
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -256,7 +166,7 @@ function decode(code) {
   code = code.replace(/^eval/, "");
   return eval(code);
 }
-function getCountryProxy(ip) {
+function getCountryProxy(params) {
   if (curIndex >= countryUrlList.length) {
     console.log("所有国家IP抓取结束");
     return;
@@ -280,24 +190,22 @@ function getCountryProxy(ip) {
   // }
 
   async.mapLimit(countryUrlList, 3, function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(url, callback) {
-      return _regenerator2.default.wrap(function _callee2$(_context2) {
+    var _ref = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee(url, callback) {
+      return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context.prev = _context.next) {
             case 0:
 
               // setTimeout(function () {
-              superagent.post(baseUrl + url).proxy(ip).end(function (err, res) {
+              superagent.post(baseUrl + url).proxy("http://127.0.0.1:1080").end(function (err, res) {
                 if (err) {
                   console.log(err);
-                  getCountryProxy(ip);
-                  return;
                 }
                 var $ = cheerio.load(res.text);
                 var xx0 = $("[type='hidden']").val();
 
                 superagent.post(baseUrl + url) //这里设置编码
-                .proxy(ip)
+                .proxy("http://127.0.0.1:1080")
                 // .set("Host", "spys.one")
                 // .set("Connection", "keep-alive")
                 // .set("Pragma", "no-cache")
@@ -371,6 +279,7 @@ function getCountryProxy(ip) {
 
             case 1:
             case "end":
+<<<<<<< HEAD
               return _context2.stop();
           }
         }
@@ -379,6 +288,16 @@ function getCountryProxy(ip) {
 
     return function (_x, _x2) {
       return _ref2.apply(this, arguments);
+=======
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    return function (_x, _x2) {
+      return _ref.apply(this, arguments);
+>>>>>>> 11a3d5b8b0abffe03e75e91136109c6469ee3cc1
     };
   }(), function (err, res) {
     console.log(err, res);
@@ -388,7 +307,28 @@ function getCountryProxy(ip) {
     //         }, 5000);
   });
 }
+function getCountryList() {
+  var userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
+  superagent.get("http://spys.one/en/proxy-by-country/") //这里设置编码
+  .proxy("http://127.0.0.1:1080").end(function (err, res) {
+    if (err) {
+      console.log("抓取spys.one信息的时候出错了");
+      return next(err);
+    }
+    var $ = cheerio.load(res.text);
+    var list = $("td[colspan=10]").first().find("tbody").first().find("tr").find("a");
 
+    list.each(function (i, l) {
+      if (i > 3) {
+        var str = $(this).attr("href");
+        countryUrlList.push(str);
+      }
+      if (i >= list.length - 1) {
+        getCountryProxy();
+      }
+    });
+  });
+}
 
 getCountryList();
 // getSpysInfo(pageNum);

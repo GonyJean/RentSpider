@@ -328,7 +328,7 @@ function getDetail(isPerson,userAgent,ip,url,title,sum,cmArr,huxing,cm,villageNa
     });
 }
 async function getInfo(Num) {
-  var obj = await getIp();
+  // var obj = await getIp();
   let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
   var ip = "http://" + obj.ip + ":" + obj.port;
 
