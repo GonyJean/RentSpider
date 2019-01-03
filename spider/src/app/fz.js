@@ -15,7 +15,7 @@ var request = require("request");
 var xml2js = require("xml2js");
 var fs = require("fs");
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8"; // 这里自行申请百度API 做地图经纬度转换用的
-var pageNum = 83;
+var pageNum = 1;
 var targetNum = 500;
 var baseUrl = "https://xj.58.com/"; //地区url 自行修改
 var userAgents = require("../../until/userAgent"); //浏览器头
@@ -328,7 +328,7 @@ function getDetail(isPerson,userAgent,ip,url,title,sum,cmArr,huxing,cm,villageNa
     });
 }
 async function getInfo(Num) {
-  // var obj = await getIp();
+  var obj = await getIp();
   let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
   var ip = "http://" + obj.ip + ":" + obj.port;
 

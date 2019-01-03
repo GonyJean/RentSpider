@@ -49,9 +49,12 @@ async function getIp() {
     // // obj.port = arr[0].port;
     // obj1 = ipAdress;
 
+    var obj = {};
     const result = await superagent.get("http://127.0.0.1:3000/getSuccessIp");
     console.log("result.headers:" + JSON.parse(result.text));
-    var obj = {};
+    if(result.text=="[]"){
+      return obj
+    }
     obj["ip"] = JSON.parse(result.text)[0].ip;
     obj["port"] = JSON.parse(result.text)[0].port;
     console.log("正在获取IP: " + obj["ip"]);
@@ -289,6 +292,7 @@ function getCountryProxy(ip) {
             "Cookie",
             "_ga=GA1.2.1941524289.1544581739; _gid=GA1.2.117946455.1544581739; _gat=1"
           )
+        
           // .set("Accept-Language", "zh-CN,zh;q=0.9")
           // .set("Accept-Encoding", "gzip, deflate")
           .set(
@@ -300,8 +304,6 @@ function getCountryProxy(ip) {
             "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
           )
           // .set("Referer", "http://spys.one/free-proxy-list/CZ/")
-          .set("Upgrade-Insecure-Requests", 1)
-          .set("Referer", baseUrl + url)
           .set("Content-Type", "application/x-www-form-urlencoded")
           // .type('form')
           .send({
@@ -416,7 +418,10 @@ function getCountryProxy(ip) {
 }
 async function getCountryList() {
     let obj = await getIp();
+    
   let ip = "http://" + obj.ip + ":" + obj.port;
+    
+    // let ip = "http://127.0.0.1:1080"
   superagent
     .get("http://spys.one/en/proxy-by-country/") //这里设置编码
     .proxy(ip)
