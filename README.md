@@ -19,6 +19,28 @@
 
 ![2](https://github.com/RentSpider/RentSpider/blob/master/img/2.png?raw=true)
 
+### 抓取的信息格式
+  ```
+    { 
+    "_id" : ObjectId("5c2ec84ae6fe663568a05df0"), 
+    "url" : "//short.***.com/zd_p/01d29255-4e1c-4358-8624-a34905577d01/?target=qc-16-xgk_hvimob_89980114658153q-feykn&end=end", 
+    "title" : "整租|2000元全包精装太原路友谊路103平米三室两厅一", 
+    "sum" : "2000", 
+    "villageName" : "尚城小区", 
+    "road" : "北京路", 
+    "area" : "新市", 
+    "payWay" : "半年付", 
+    "isPerson" : "0", 
+    "postTime" : "2019/01/04", 
+    "location" : {
+        "lng" : "87.5492187964", 
+        "lat" : "43.8983242906"
+    }, 
+    "cm" : "102㎡", 
+    "huxing" : "3室2厅1卫", 
+    "__v" : NumberInt(0)
+}
+  ```
 ## 前端
 最终决定用React来做了
 ## 后台
