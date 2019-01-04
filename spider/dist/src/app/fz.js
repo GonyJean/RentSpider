@@ -151,7 +151,7 @@ var getInfo = function () {
                           getInfo();
                           return;
                         }
-                        if (result && ("ttFont" in result)) {
+                        if (result && "ttFont" in result) {
                           var fontList = result.ttFont.glyf[0].TTGlyph;
                           var dictList = result.ttFont.cmap[0].cmap_format_12;
                           fontList.map(function (l, i) {
@@ -220,16 +220,13 @@ var getInfo = function () {
 
                           console.log(trFontlist);
                         } else {
-                          console.log('字体文件[没了],重新获取');
-
-                          getInfo();
+                          console.log("字体文件[没了],重新获取");
+                          getInfo(Num);
                           return;
                         }
-
                         /**
                          * 遍历DOM 进行存储
                          */
-
                         async.mapLimit(list, 3, function () {
                           var _ref4 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3(e, callback) {
                             var url, title, sum, cmArr, huxing, cm, villageName, road, isPerson, postTime, location;
@@ -249,7 +246,7 @@ var getInfo = function () {
 
                                     cm = cmArr[1]; // 面积
 
-                                    villageName = $(e).find(".add").find("a").eq(1).text(); //  小区名称
+                                    villageName = $(e).find(".add").find("a").eq(1).text().replace(/[\r\n...\s+]/g, ""); //  小区名称
 
                                     road = $(e).find(".add").find("a").eq(0).text().replace(/[\r\n\s+]/g, ""); // 路
 
@@ -277,7 +274,17 @@ var getInfo = function () {
                           console.log("===============出错重新运行=====================");
                           console.log(err);
                           if (!err) {}
-                          getInfo();
+                          if (pageNum <= targetNum) {
+                            pageNum++;
+                            console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
+                            console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
+                            console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
+                            fs.writeFile("curPage.txt", pageNum, function (err) {});
+                            getInfo();
+                          } else {
+                            console.log("获取结束");
+                            return;
+                          }
 
                           console.log("===============================================");
                         });
@@ -307,8 +314,6 @@ var getInfo = function () {
     return _ref3.apply(this, arguments);
   };
 }();
-
-var _fontTransform = require("../../until/fontTransform");
 
 var _reg = require("../../until/reg");
 
@@ -344,13 +349,13 @@ var exec = require("child_process").exec;
 
 requestProxy(superagent);
 charset(superagent);
-var dataBuffer = new Buffer(_fontTransform.base64Font, "base64");
-var font_dict = [];
 // var eventproxy = require('eventproxy');  //流程控制
 // var ep = eventproxy();
 moment.locale("zh-cn");
-
 var parser = new xml2js.Parser();
+fs.readFile("curPage.txt", "utf-8", function (err, data) {
+  pageNum = data;
+});
 
 function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, villageName, road, location, postTime, trFontlist, callback) {
   superagent.post("https:" + url).set({ "User-Agent": userAgent }).set({
@@ -374,7 +379,6 @@ function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, 
         console.log("抓取第" + pageNum + "页[坐标信息]的时候出错了");
         return;
       }
-      var parser = new xml2js.Parser();
       parser.parseString(res.text, function (err, result) {
         location.lat = result.GeocoderSearchResponse.result[0].location[0].lat[0];
         location.lng = result.GeocoderSearchResponse.result[0].location[0].lng[0];
@@ -438,38 +442,15 @@ function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, 
 
         insert(url, realTitle, realSum, villageName, road, area, payWay, isPerson, postTime, location, realCm, realHuxing);
         console.log("房价字体已经过转换:" + sum + "==>" + realSum + "\n" + "标题字体已转换:" + title + "==>" + realTitle + "\n" + "户型字体已转换:" + huxing + "==>" + realHuxing + "\n");
-      }
-      // else if (!isPerson && url&& (area.length > 1 && payWay.length > 1)) {
-      //   insert(
-      //     url,
-      //     title,
-      //     sum,
-      //     villageName,
-      //     road,
-      //     area,
-      //     payWay,
-      //     isPerson,
-      //     postTime,
-      //     location,
-      //     cm,
-      //     huxing
-      //   );
-      // } 
-      else {
-          getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, villageName, road, location, postTime, trFontlist, callback);
-          return;
-        }
-
+        console.log("【" + title + "】页详情抓取结束\n");
       callback();
+      } else {
+        // getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, villageName, road, location, postTime, trFontlist, callback);
+        console.log("【"+title+"】页详情抓取失败，【放弃】抓取!!!!\n");
+        return;
+      }
+
     });
-    console.log("第" + pageNum + "页抓取结束");
-    if (pageNum <= targetNum) {
-      getInfo();
-      pageNum++;
-    } else {
-      console.log("获取结束");
-      return;
-    }
   });
 }
 

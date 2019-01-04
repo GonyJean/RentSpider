@@ -21,19 +21,17 @@ var baseUrl = "https://xj.58.com/"; //地区url 自行修改
 var userAgents = require("../../until/userAgent"); //浏览器头
 var exec = require("child_process").exec;
 // import fonttools from 'fonttools';
-import { base64Font, XMLDate } from "../../until/fontTransform";
 import { baseReg } from "../../until/reg";
 import { str2utf8, uniencode, decodeUnicode } from "../../until/common";
 requestProxy(superagent);
 charset(superagent);
-var dataBuffer = new Buffer(base64Font, "base64");
-var font_dict = [];
 // var eventproxy = require('eventproxy');  //流程控制
 // var ep = eventproxy();
 moment.locale("zh-cn");
-
 var parser = new xml2js.Parser();
-
+fs.readFile("curPage.txt", "utf-8", function(err, data) {
+  pageNum = data;
+});
 async function insert(
   url,
   title,
@@ -114,7 +112,23 @@ async function getIp() {
   //   return obj1
   // });
 }
-function getDetail(isPerson,userAgent,ip,url,title,sum,cmArr,huxing,cm,villageName,road,location,postTime,trFontlist,callback) {
+function getDetail(
+  isPerson,
+  userAgent,
+  ip,
+  url,
+  title,
+  sum,
+  cmArr,
+  huxing,
+  cm,
+  villageName,
+  road,
+  location,
+  postTime,
+  trFontlist,
+  callback
+) {
   superagent
     .post("https:" + url)
     .set({ "User-Agent": userAgent })
@@ -165,7 +179,6 @@ function getDetail(isPerson,userAgent,ip,url,title,sum,cmArr,huxing,cm,villageNa
             console.log("抓取第" + pageNum + "页[坐标信息]的时候出错了");
             return;
           }
-          var parser = new xml2js.Parser();
           parser.parseString(res.text, function(err, result) {
             location.lat =
               result.GeocoderSearchResponse.result[0].location[0].lat[0];
@@ -272,59 +285,34 @@ function getDetail(isPerson,userAgent,ip,url,title,sum,cmArr,huxing,cm,villageNa
                 realHuxing +
                 "\n"
             );
-          } 
-          // else if (!isPerson && url&& (area.length > 1 && payWay.length > 1)) {
-          //   insert(
-          //     url,
-          //     title,
-          //     sum,
-          //     villageName,
-          //     road,
-          //     area,
-          //     payWay,
-          //     isPerson,
-          //     postTime,
-          //     location,
-          //     cm,
-          //     huxing
-          //   );
-          // } 
+            console.log("【"+title+"】页详情抓取结束\n");
+            callback();
+          }
           else {
-            getDetail(
-              isPerson,
-              userAgent,
-              ip,
-              url,
-              title,
-              sum,
-              cmArr,
-              huxing,
-              cm,
-              villageName,
-              road,
-              location,
-              postTime,
-              trFontlist,
-              callback
-            );
+            // getDetail(
+            //   isPerson,
+            //   userAgent,
+            //   ip,
+            //   url,
+            //   title,
+            //   sum,
+            //   cmArr,
+            //   huxing,
+            //   cm,
+            //   villageName,
+            //   road,
+            //   location,
+            //   postTime,
+            //   trFontlist,
+            //   callback
+            // );
+            console.log("【"+title+"】页详情抓取失败，【放弃】抓取!!!!\n");
             return;
           }
-            
+
           
-          
-            
-          
-           callback();
         });
-      console.log("第" + pageNum + "页抓取结束");
-      if (pageNum <= targetNum) {
-        getInfo();
-        pageNum++;
-      } else {
-        console.log("获取结束");
-        return;
-      }
-     
+      
     });
 }
 async function getInfo(Num) {
@@ -354,7 +342,7 @@ async function getInfo(Num) {
         console.log(
           "抓取第" + pageNum + "页 [列表信息]的时候出错了,错误信息:" + err
         );
-    
+
         getInfo();
         console.log("正在重新获取IP...");
         return;
@@ -386,91 +374,87 @@ async function getInfo(Num) {
             }
             fs.readFile("6329.xml", "utf-8", function(e, r) {
               parser.parseString(r, function(err, result) {
-                if(err){
-                  getInfo()
+                if (err) {
+                  getInfo();
                   return;
                 }
-                if("ttFont" in result){
-                   var fontList = result.ttFont.glyf[0].TTGlyph;
-                var dictList = result.ttFont.cmap[0].cmap_format_12;
-                fontList.map((l, i) => {
-                  var curName = null; // 当前匹配到的字体名称
-                  var curIndex = 0;
-                  // 0
-                  if (l.$.xMax == "1113") {
-                    curName = l.$.name;
-                    curIndex = 0;
-                  }
-                  // 1
-                  if (l.$.xMax == "1077") {
-                    curName = l.$.name;
-                    curIndex = 1;
-                  }
-                  // 2
-                  if (l.$.xMax == "1062") {
-                    curName = l.$.name;
-                    curIndex = 2;
-                  }
-                  // 3
-                  if (l.$.xMax == "1049") {
-                    curName = l.$.name;
-                    curIndex = 3;
-                  }
-                  // 4
-                  if (l.$.xMax == "1128") {
-                    curName = l.$.name;
-                    curIndex = 4;
-                  }
-                  // 5
-                  if (l.$.xMax == "1057") {
-                    curName = l.$.name;
-                    curIndex = 5;
-                  }
-                  // 6
-                  if (l.$.xMax == "1115") {
-                    curName = l.$.name;
-                    curIndex = 6;
-                  }
-                  // 7
-                  if (l.$.xMax == "1101") {
-                    curName = l.$.name;
-                    curIndex = 7;
-                  }
-                  // 8
-                  if (l.$.xMax == "1098") {
-                    curName = l.$.name;
-                    curIndex = 8;
-                  }
-                  // 9
-                  if (l.$.xMax == "1094") {
-                    curName = l.$.name;
-                    curIndex = 9;
-                  }
+                if (result && "ttFont" in result) {
+                  var fontList = result.ttFont.glyf[0].TTGlyph;
+                  var dictList = result.ttFont.cmap[0].cmap_format_12;
+                  fontList.map((l, i) => {
+                    var curName = null; // 当前匹配到的字体名称
+                    var curIndex = 0;
+                    // 0
+                    if (l.$.xMax == "1113") {
+                      curName = l.$.name;
+                      curIndex = 0;
+                    }
+                    // 1
+                    if (l.$.xMax == "1077") {
+                      curName = l.$.name;
+                      curIndex = 1;
+                    }
+                    // 2
+                    if (l.$.xMax == "1062") {
+                      curName = l.$.name;
+                      curIndex = 2;
+                    }
+                    // 3
+                    if (l.$.xMax == "1049") {
+                      curName = l.$.name;
+                      curIndex = 3;
+                    }
+                    // 4
+                    if (l.$.xMax == "1128") {
+                      curName = l.$.name;
+                      curIndex = 4;
+                    }
+                    // 5
+                    if (l.$.xMax == "1057") {
+                      curName = l.$.name;
+                      curIndex = 5;
+                    }
+                    // 6
+                    if (l.$.xMax == "1115") {
+                      curName = l.$.name;
+                      curIndex = 6;
+                    }
+                    // 7
+                    if (l.$.xMax == "1101") {
+                      curName = l.$.name;
+                      curIndex = 7;
+                    }
+                    // 8
+                    if (l.$.xMax == "1098") {
+                      curName = l.$.name;
+                      curIndex = 8;
+                    }
+                    // 9
+                    if (l.$.xMax == "1094") {
+                      curName = l.$.name;
+                      curIndex = 9;
+                    }
 
-                  dictList.map((m, mIndex) => {
-                    m.map.map((n, nIndex) => {
-                      if (n.$.name == curName && n.$.name != "glyph00000")
-                        trFontlist[curIndex] = n.$.code;
+                    dictList.map((m, mIndex) => {
+                      m.map.map((n, nIndex) => {
+                        if (n.$.name == curName && n.$.name != "glyph00000")
+                          trFontlist[curIndex] = n.$.code;
+                      });
+                    });
+                    trFontlist.map((l, i) => {
+                      trFontlist[i] = trFontlist[i].replace("0x", "u");
                     });
                   });
-                  trFontlist.map((l, i) => {
-                    trFontlist[i] = trFontlist[i].replace("0x", "u");
-                  });
-                });
 
-                console.log(trFontlist);
-                }else{
-                  console.log('字体文件[没了],重新获取');
-                  
-                  getInfo()
+                  console.log(trFontlist);
+                } else {
+                  console.log("字体文件[没了],重新获取");
+                  getInfo(Num);
                   return;
                 }
-               
-
                 /**
                  * 遍历DOM 进行存储
                  */
-
                 async.mapLimit(
                   list,
                   3,
@@ -500,7 +484,7 @@ async function getInfo(Num) {
                       .find(".add")
                       .find("a")
                       .eq(1)
-                      .text(); //  小区名称
+                      .text().replace(/[\r\n...\s+]/g, ""); //  小区名称
                     var road = $(e)
                       .find(".add")
                       .find("a")
@@ -535,7 +519,7 @@ async function getInfo(Num) {
                         trFontlist,
                         callback
                       );
-                      
+                   
                     }
                   },
                   function(err, res) {
@@ -545,7 +529,23 @@ async function getInfo(Num) {
                     console.log(err);
                     if (!err) {
                     }
-                    getInfo();
+                     if (pageNum <= targetNum) {
+                      pageNum++;
+                      console.log(
+                      "===============现在开始获取第"+pageNum+"页的信息了====================="
+                    );
+                      console.log(
+                      "===============现在开始获取第"+pageNum+"页的信息了====================="
+                    );
+                      console.log(
+                      "===============现在开始获取第"+pageNum+"页的信息了====================="
+                    );
+                      fs.writeFile("curPage.txt", pageNum, function(err) {});
+                      getInfo();
+                    } else {
+                      console.log("获取结束");
+                      return;
+                    }
 
                     console.log(
                       "==============================================="
