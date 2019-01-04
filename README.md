@@ -20,7 +20,7 @@
 ![2](https://github.com/RentSpider/RentSpider/blob/master/img/2.png?raw=true)
 
 ### 抓取的信息格式
-  ```
+  ``` json
     { 
     "_id" : ObjectId("5c2ec84ae6fe663568a05df0"), 
     "url" : "//short.***.com/zd_p/01d29255-4e1c-4358-8624-a34905577d01/?target=qc-16-xgk_hvimob_89980114658153q-feykn&end=end", 
