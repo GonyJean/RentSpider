@@ -1,5 +1,5 @@
 # RentSpider 
-<font face="黑体" color="red">由GonyMaster发起的业余项目，旨在分析各个城市的房租（房价）数据。</font>  
+<font color="red">由GonyMaster发起的业余项目，旨在分析各个城市的房租（房价）数据。</font>  
 
 #### 目前阶段:爬虫完善ing...  
 ---
