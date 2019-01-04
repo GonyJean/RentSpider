@@ -443,7 +443,7 @@ function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, 
         insert(url, realTitle, realSum, villageName, road, area, payWay, isPerson, postTime, location, realCm, realHuxing);
         console.log("房价字体已经过转换:" + sum + "==>" + realSum + "\n" + "标题字体已转换:" + title + "==>" + realTitle + "\n" + "户型字体已转换:" + huxing + "==>" + realHuxing + "\n");
         console.log("【" + title + "】页详情抓取结束\n");
-      callback();
+        callback();
       } else {
         // getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, villageName, road, location, postTime, trFontlist, callback);
         console.log("【"+title+"】页详情抓取失败，【放弃】抓取!!!!\n");

@@ -285,10 +285,9 @@ function getDetail(
                 realHuxing +
                 "\n"
             );
-            console.log("【"+title+"】页详情抓取结束\n");
+            console.log("【" + title + "】页详情抓取结束\n");
             callback();
-          }
-          else {
+          } else {
             // getDetail(
             //   isPerson,
             //   userAgent,
@@ -306,13 +305,10 @@ function getDetail(
             //   trFontlist,
             //   callback
             // );
-            console.log("【"+title+"】页详情抓取失败，【放弃】抓取!!!!\n");
+            console.log("【" + title + "】页详情抓取失败，【放弃】抓取!!!!\n");
             return;
           }
-
-          
         });
-      
     });
 }
 async function getInfo(Num) {
@@ -457,7 +453,7 @@ async function getInfo(Num) {
                  */
                 async.mapLimit(
                   list,
-                  3,
+                  4,
                   async function(e, callback) {
                     // var obj = await getIp();
                     // var ip = "http://" + obj["ip"] + ":" + obj["port"];
@@ -484,7 +480,8 @@ async function getInfo(Num) {
                       .find(".add")
                       .find("a")
                       .eq(1)
-                      .text().replace(/[\r\n...\s+]/g, ""); //  小区名称
+                      .text()
+                      .replace(/[\r\n...\s+]/g, ""); //  小区名称
                     var road = $(e)
                       .find(".add")
                       .find("a")
@@ -519,37 +516,40 @@ async function getInfo(Num) {
                         trFontlist,
                         callback
                       );
-                   
                     }
                   },
                   function(err, res) {
-                    console.log(
-                      "===============出错重新运行====================="
-                    );
-                    console.log(err);
                     if (!err) {
-                    }
-                     if (pageNum <= targetNum) {
+                      console.log(
+                        "===============出错重新运行====================="
+                      );
+                      console.log(err);
+                      getInfo();
+                    }else {
+                      if (pageNum <= targetNum) {
                       pageNum++;
                       console.log(
-                      "===============现在开始获取第"+pageNum+"页的信息了====================="
-                    );
+                        "===============现在开始获取第" +
+                          pageNum +
+                          "页的信息了====================="
+                      );
                       console.log(
-                      "===============现在开始获取第"+pageNum+"页的信息了====================="
-                    );
+                        "===============现在开始获取第" +
+                          pageNum +
+                          "页的信息了====================="
+                      );
                       console.log(
-                      "===============现在开始获取第"+pageNum+"页的信息了====================="
-                    );
+                        "===============现在开始获取第" +
+                          pageNum +
+                          "页的信息了====================="
+                      );
                       fs.writeFile("curPage.txt", pageNum, function(err) {});
                       getInfo();
                     } else {
                       console.log("获取结束");
                       return;
                     }
-
-                    console.log(
-                      "==============================================="
-                    );
+                    }
                   }
                 );
               });
