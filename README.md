@@ -1,5 +1,5 @@
 # RentSpider 
-由GonyMaster发起的业余项目，旨在分析各个城市的房租（房价）数据。  
+<font face="黑体" color="red">由GonyMaster发起的业余项目，旨在分析各个城市的房租（房价）数据。</font>  
 
 #### 目前阶段:爬虫完善ing...  
 ---
@@ -20,7 +20,7 @@
 ![2](https://github.com/RentSpider/RentSpider/blob/master/img/2.png?raw=true)
 
 ### 抓取的信息格式
-  ``` json
+  ``` js
     { 
     "_id" : ObjectId("5c2ec84ae6fe663568a05df0"), 
     "url" : "//short.***.com/zd_p/01d29255-4e1c-4358-8624-a34905577d01/?target=qc-16-xgk_hvimob_89980114658153q-feykn&end=end", 
