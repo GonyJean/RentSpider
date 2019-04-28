@@ -32,7 +32,8 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-3": "^6.24.1"
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0"
   },
   "scripts": {
     "arf": "nodemon src/app.js --exec babel-node --config package.json",

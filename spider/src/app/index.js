@@ -140,6 +140,7 @@ function getInfo(Num) {
           .eq(1)
           .text()
           .replace(/[\r\n\s+]/g, ""); // 片区
+          
         var address = $(this)
           .find(".baseinfo")
           .eq(1)
@@ -208,10 +209,14 @@ function getInfo(Num) {
           });
       });
       pageNum++;
-      if (pageNum <= targetNum) {
+      if (pageNum <= targetNum && list.length >=1) {
         console.log("第" + pageNum + "页抓取结束");
         setTimeout(getInfo, 5050, pageNum);
-      } else {
+      }
+      else if(list.length ==0){
+        console.log("抓取列表长度为空!!!!");
+      }
+       else {
         console.log("抓取结束了");
         return;
       }

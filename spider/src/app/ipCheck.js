@@ -15,7 +15,7 @@ var xiciInfo = require("../../schema/xc.js");
 var request = require("request");
 var xml2js = require("xml2js");
 var userAgents = require("../../until/userAgent"); //浏览器头
-import{Common} from "../until/common" ; 
+import {Common} from "../until/common" ; 
 // var eventproxy = require('eventproxy');  //流程控制
 // var ep = eventproxy();
 var baiduAK = "MfZGTw9zGqS8PbmjVN66IrbDGmI9SVM8";

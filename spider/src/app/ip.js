@@ -265,10 +265,10 @@ function getCountryProxy(ip) {
   //   curIndex += 10;
   // }
 
-  async.mapLimit(countryUrlList,3, async function(url, callback) {
+  async.mapLimit(countryUrlList,3,  function(url, callback) {
 
     // setTimeout(function () {
-    superagent
+     superagent
       .post(baseUrl + url) 
       .proxy(ip)
       .end(function(err, res) {
@@ -419,15 +419,17 @@ function getCountryProxy(ip) {
 async function getCountryList() {
     let obj = await getIp();
     
-  let ip = "http://" + obj.ip + ":" + obj.port;
+  // let ip = "http://" + obj.ip + ":" + obj.port;
     
-    // let ip = "http://127.0.0.1:1080"
+    let ip = "http://127.0.0.1:1080"
+    // let ip = "http://138.197.162.114:8080"
   superagent
     .get("http://spys.one/en/proxy-by-country/") //这里设置编码
     .proxy(ip)
     .end((err, res) => {
       if (err) {
         console.log("抓取spys.one信息的时候出错了");
+        console.log(err);
         getCountryList()
         return;
       }

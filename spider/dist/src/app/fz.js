@@ -227,7 +227,7 @@ var getInfo = function () {
                         /**
                          * 遍历DOM 进行存储
                          */
-                        async.mapLimit(list, 3, function () {
+                        async.mapLimit(list, 4, function () {
                           var _ref4 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3(e, callback) {
                             var url, title, sum, cmArr, huxing, cm, villageName, road, isPerson, postTime, location;
                             return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -271,22 +271,23 @@ var getInfo = function () {
                             return _ref4.apply(this, arguments);
                           };
                         }(), function (err, res) {
-                          console.log("===============出错重新运行=====================");
-                          console.log(err);
-                          if (!err) {}
-                          if (pageNum <= targetNum) {
-                            pageNum++;
-                            console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
-                            console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
-                            console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
-                            fs.writeFile("curPage.txt", pageNum, function (err) {});
+                          if (!err) {
+                            console.log("===============出错重新运行=====================");
+                            console.log(err);
                             getInfo();
                           } else {
-                            console.log("获取结束");
-                            return;
+                            if (pageNum <= targetNum) {
+                              pageNum++;
+                              console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
+                              console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
+                              console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
+                              fs.writeFile("curPage.txt", pageNum, function (err) {});
+                              getInfo();
+                            } else {
+                              console.log("获取结束");
+                              return;
+                            }
                           }
-
-                          console.log("===============================================");
                         });
                       });
                     });
@@ -445,11 +446,26 @@ function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, 
         console.log("【" + title + "】页详情抓取结束\n");
         callback();
       } else {
-        // getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, villageName, road, location, postTime, trFontlist, callback);
-        console.log("【"+title+"】页详情抓取失败，【放弃】抓取!!!!\n");
+        // getDetail(
+        //   isPerson,
+        //   userAgent,
+        //   ip,
+        //   url,
+        //   title,
+        //   sum,
+        //   cmArr,
+        //   huxing,
+        //   cm,
+        //   villageName,
+        //   road,
+        //   location,
+        //   postTime,
+        //   trFontlist,
+        //   callback
+        // );
+        console.log("【" + title + "】页详情抓取失败，【放弃】抓取!!!!\n");
         return;
       }
-
     });
   });
 }
