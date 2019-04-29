@@ -129,12 +129,13 @@ function getDetail(
   trFontlist,
   callback
 ) {
+  // var ip = 'http://127.0.0.1:1080'
   superagent
-    .post("https:" + url)
+    .post(url)
     .set({ "User-Agent": userAgent })
     .set({
       Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
     })
     .proxy(ip)
     .timeout({ response: 5000, deadline: 60000 })
@@ -174,7 +175,7 @@ function getDetail(
               "&callback=showLocation"
           )
         )
-        .end(function(err, res) {
+        .end(async function(err, res) {
           if (err) {
             console.log("抓取第" + pageNum + "页[坐标信息]的时候出错了");
             return;
@@ -288,23 +289,26 @@ function getDetail(
             console.log("【" + title + "】页详情抓取结束\n");
             callback();
           } else {
-            // getDetail(
-            //   isPerson,
-            //   userAgent,
-            //   ip,
-            //   url,
-            //   title,
-            //   sum,
-            //   cmArr,
-            //   huxing,
-            //   cm,
-            //   villageName,
-            //   road,
-            //   location,
-            //   postTime,
-            //   trFontlist,
-            //   callback
-            // );
+              let obj = await getIp();
+  let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
+  let ip = "http://" + obj.ip + ":" + obj.port;
+            getDetail(
+              isPerson,
+              userAgent,
+              ip,
+              url,
+              title,
+              sum,
+              cmArr,
+              huxing,
+              cm,
+              villageName,
+              road,
+              location,
+              postTime,
+              trFontlist,
+              callback
+            );
             console.log("【" + title + "】页详情抓取失败，【放弃】抓取!!!!\n");
             return;
           }
@@ -332,7 +336,7 @@ async function getInfo(Num) {
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
     })
     .proxy(ip)
-    .timeout({ response: 4000, deadline: 60000 })
+    .timeout({ response:5000})
     .end(function(err, res) {
       if (err) {
         console.log(
@@ -352,7 +356,7 @@ async function getInfo(Num) {
       ) {
         var bBase64 = $("html head script").last()[0].children[0].data; // base64处理前
         var aBase64 = baseReg(bBase64); // base64处理后
-        aBase64 = new Buffer(aBase64, "base64");
+        aBase64 = Buffer.from(aBase64,'base64');
         var list = $(".listUl li");
         var title = $(".des h2 a");
         var sum = $(".price .sum b").text() + $(".price .sum");

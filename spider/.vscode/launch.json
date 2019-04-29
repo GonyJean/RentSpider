@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "server launch",
-      "program": "${workspaceFolder}/src/app/ipCheck.js",
+      "program": "${workspaceFolder}/src/app/fz.js",
       "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/babel-node",
       "cwd": "${workspaceRoot}",
       "sourceMaps": true

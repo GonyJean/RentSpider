@@ -82,11 +82,13 @@ async function getInfo() {
     function(obj, callback) {
       let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
       var ip = "http://" + obj.ip + ":" + obj.port;
+      // var ip = "http://127.0.0.1:1080";
+      
       superagent
         .get("https://xj.58.com") //这里设置编码
         .set({ "User-Agent": userAgent })
         .proxy(ip)
-        .timeout({ response: 4000, deadline: 60000 })
+        .timeout({ response: 4000 })
         .end(function(err, res) {
           var curip = obj.ip;
           if (err) {
