@@ -29,7 +29,7 @@ charset(superagent);
 // var ep = eventproxy();
 moment.locale("zh-cn");
 var parser = new xml2js.Parser();
-fs.readFile("curPage.txt", "utf-8", function(err, data) {
+fs.readFile("./curPage.txt", "utf-8", function(err, data) {
   pageNum = data;
 });
 async function insert(
@@ -87,7 +87,7 @@ async function getIp() {
     // // obj.port = arr[0].port;
     // obj1 = ipAdress;
 
-    const result = await superagent.get("http://127.0.0.1:3000/getSuccessIp");
+    const result = await superagent.get("http://127.0.0.1:3000/getIp");
     console.log("result.headers:" + JSON.parse(result.text));
     var obj = {};
     obj["ip"] = JSON.parse(result.text)[0].ip;
@@ -138,7 +138,7 @@ function getDetail(
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
     })
     .proxy(ip)
-    .timeout({ response: 5000, deadline: 60000 })
+    .timeout({ response: 5000, deadline: 10000 })
     .end((err, res) => {
       if (err) {
         console.log(
@@ -187,7 +187,7 @@ function getDetail(
               result.GeocoderSearchResponse.result[0].location[0].lng[0];
           });
 
-          if (url && (area.length > 1 && payWay.length > 1)) {
+          if (url && (area.length > 0 && payWay.length > 0)) {
             var realSum = "";
             var realTitle = "";
             var realCm = "";
@@ -287,29 +287,31 @@ function getDetail(
                 "\n"
             );
             console.log("【" + title + "】页详情抓取结束\n");
-            callback();
+            callback(null);
+            return;
           } else {
-              let obj = await getIp();
-  let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
-  let ip = "http://" + obj.ip + ":" + obj.port;
-            getDetail(
-              isPerson,
-              userAgent,
-              ip,
-              url,
-              title,
-              sum,
-              cmArr,
-              huxing,
-              cm,
-              villageName,
-              road,
-              location,
-              postTime,
-              trFontlist,
-              callback
-            );
+  //             let obj = await getIp();
+  // let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
+  // let ip = "http://" + obj.ip + ":" + obj.port;
+            // getDetail(
+            //   isPerson,
+            //   userAgent,
+            //   ip,
+            //   url,
+            //   title,
+            //   sum,
+            //   cmArr,
+            //   huxing,
+            //   cm,
+            //   villageName,
+            //   road,
+            //   location,
+            //   postTime,
+            //   trFontlist,
+            //   callback
+            // );
             console.log("【" + title + "】页详情抓取失败，【放弃】抓取!!!!\n");
+            callback('err');
             return;
           }
         });
@@ -336,14 +338,14 @@ async function getInfo(Num) {
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
     })
     .proxy(ip)
-    .timeout({ response:5000})
+    .timeout({ response: 5000, deadline:10000 })
     .end(function(err, res) {
       if (err) {
         console.log(
           "抓取第" + pageNum + "页 [列表信息]的时候出错了,错误信息:" + err
         );
 
-        getInfo();
+        getInfo(pageNum);
         console.log("正在重新获取IP...");
         return;
       }
@@ -523,7 +525,7 @@ async function getInfo(Num) {
                     }
                   },
                   function(err, res) {
-                    if (!err) {
+                    if (err) {
                       console.log(
                         "===============出错重新运行====================="
                       );
@@ -531,7 +533,7 @@ async function getInfo(Num) {
                       getInfo();
                     }else {
                       if (pageNum <= targetNum) {
-                      pageNum++;
+                        pageNum++
                       console.log(
                         "===============现在开始获取第" +
                           pageNum +
@@ -547,9 +549,11 @@ async function getInfo(Num) {
                           pageNum +
                           "页的信息了====================="
                       );
-                      fs.writeFile("curPage.txt", pageNum, function(err) {});
+                      fs.writeFile("./curPage.txt", pageNum, function(err) {});
                       getInfo();
+                      return
                     } else {
+                      fs.writeFile("./curPage.txt", pageNum, function(err) {});
                       console.log("获取结束");
                       return;
                     }

@@ -84,7 +84,7 @@ function getInfo(Num) {
       baseInfo.type = $(this).find(".baseinfo").eq(0).find("span").eq(3).text(); // 类型(多层/高层)
       var villageName = $(this).find(".baseinfo").eq(1).find("span a").eq(0).text(); //  小区名称
       var area = $(this).find(".baseinfo").eq(1).find("span a").eq(1).text().replace(/[\r\n\s+]/g, ""); // 片区
-      debugger;
+
       var address = $(this).find(".baseinfo").eq(1).find("span a").eq(2).text().replace(/[\r\n\s+]/g, ""); // 地址
       var developers = $(this).find(".jjrinfo").text().replace(/[\r\n\s+]/g, ""); // 开发商
       user.name = $(this).find(".jjrinfo a").text().replace(/[\r\n\s+]/g, "");
@@ -110,9 +110,11 @@ function getInfo(Num) {
       });
     });
     pageNum++;
-    if (pageNum <= targetNum) {
+    if (pageNum <= targetNum && list.length >= 1) {
       console.log("第" + pageNum + "页抓取结束");
       setTimeout(getInfo, 5050, pageNum);
+    } else if (list.length == 0) {
+      console.log("抓取列表长度为空!!!!");
     } else {
       console.log("抓取结束了");
       return;

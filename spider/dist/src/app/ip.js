@@ -31,7 +31,7 @@ var getIp = function () {
 
             obj = {};
             _context.next = 5;
-            return superagent.get("http://127.0.0.1:3000/getSuccessIp");
+            return superagent.get("http://127.0.0.1:3000/getIp");
 
           case 5:
             result = _context.sent;
@@ -71,25 +71,26 @@ var getIp = function () {
 }();
 
 var getCountryList = function () {
-  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+  var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
     var obj, ip;
-    return _regenerator2.default.wrap(function _callee3$(_context3) {
+    return _regenerator2.default.wrap(function _callee2$(_context2) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context2.prev = _context2.next) {
           case 0:
-            _context3.next = 2;
+            _context2.next = 2;
             return getIp();
 
           case 2:
-            obj = _context3.sent;
+            obj = _context2.sent;
             ip = "http://" + obj.ip + ":" + obj.port;
-
             // let ip = "http://127.0.0.1:1080"
+            // let ip = "http://138.197.162.114:8080"
 
             superagent.get("http://spys.one/en/proxy-by-country/") //这里设置编码
             .proxy(ip).end(function (err, res) {
               if (err) {
                 console.log("抓取spys.one信息的时候出错了");
+                console.log(err);
                 getCountryList();
                 return;
               }
@@ -109,14 +110,14 @@ var getCountryList = function () {
 
           case 5:
           case "end":
-            return _context3.stop();
+            return _context2.stop();
         }
       }
-    }, _callee3, this);
+    }, _callee2, this);
   }));
 
   return function getCountryList() {
-    return _ref3.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 }();
 
@@ -305,113 +306,96 @@ function getCountryProxy(ip) {
   //   curIndex += 10;
   // }
 
-  async.mapLimit(countryUrlList, 3, function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee2(url, callback) {
-      return _regenerator2.default.wrap(function _callee2$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
+  async.mapLimit(countryUrlList, 3, function (url, callback) {
 
-              // setTimeout(function () {
-              superagent.post(baseUrl + url).proxy(ip).end(function (err, res) {
-                if (err) {
-                  console.log(err);
-                  getCountryProxy(ip);
-                  return;
-                }
-                var $ = cheerio.load(res.text);
-                var xx0 = $("[type='hidden']").val();
+    // setTimeout(function () {
+    superagent.post(baseUrl + url).proxy(ip).end(function (err, res) {
+      if (err) {
+        console.log(err);
+        getCountryProxy(ip);
+        return;
+      }
+      var $ = cheerio.load(res.text);
+      var xx0 = $("[type='hidden']").val();
 
-                superagent.post(baseUrl + url) //这里设置编码
-                .proxy(ip)
-                // .set("Host", "spys.one")
-                // .set("Connection", "keep-alive")
-                // .set("Pragma", "no-cache")
-                // .set("Cache-Control", "no-cache")
-                // .set("Origin", "http://spys.one")
-                .set("Cookie", "_ga=GA1.2.1941524289.1544581739; _gid=GA1.2.117946455.1544581739; _gat=1")
+      superagent.post(baseUrl + url) //这里设置编码
+      .proxy(ip)
+      // .set("Host", "spys.one")
+      // .set("Connection", "keep-alive")
+      // .set("Pragma", "no-cache")
+      // .set("Cache-Control", "no-cache")
+      // .set("Origin", "http://spys.one")
+      .set("Cookie", "_ga=GA1.2.1941524289.1544581739; _gid=GA1.2.117946455.1544581739; _gat=1")
 
-                // .set("Accept-Language", "zh-CN,zh;q=0.9")
-                // .set("Accept-Encoding", "gzip, deflate")
-                .set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36").set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
-                // .set("Referer", "http://spys.one/free-proxy-list/CZ/")
-                .set("Content-Type", "application/x-www-form-urlencoded")
-                // .type('form')
-                .send({
-                  xx0: xx0,
-                  xpp: 5,
-                  xf1: 0,
-                  xf2: 0,
-                  xf4: 0,
-                  xf5: 0
-                }).end(function (err, res) {
-                  if (err) {
-                    console.log(err);
-                  }
-                  if (res.text) {
-                    var $ = cheerio.load(res.text);
-                    var script = $("script").eq(3)[0].children[0].data;
-                    var script1 = decode(script);
-                    var list = $("td[colspan=10]").first().find("tbody").find("tr");
-                    var arr = script1.split(";");
-                    var disarr = [];
-                    var obj = {};
-                    var objDist = {};
-                    arr.map(function (l, i) {
-                      if (l.length >= 18) {
-                        obj[l.substring(l.indexOf("="), -1)] = l.substring(l.indexOf("=") + 1).substring("^", l.substring(l.indexOf("=") + 1).indexOf("^"));
-                      }
-                      if (l.length <= 15) {
-                        objDist[l.substring(l.indexOf("="), -1)] = l.substring(l.indexOf("=") + 1);
-                      }
-                    });
-                    list.each(function (i, e) {
-                      if (i > 2) {
-                        var ip = $(this).find("td:nth-child(1)").find(".spy14").text();
-                        if ($(this).find("td:nth-child(1)").find(".spy14").children()[0]) {
-                          var portBefore1 = $(this).find("td:nth-child(1)").find(".spy14").children()[0].children[0].data;
-                          var portBefore2 = portBefore1.substring(portBefore1.indexOf("+") + 1);
-                          var portBefore3 = portBefore2.substring(portBefore2.length - 1, -1);
-
-                          var portBefore4 = portBefore3.split("+");
-                          var port = "";
-                          portBefore4.map(function (l, i) {
-                            var portBefore5 = l.substring(l.indexOf("^"), -1).substring(1);
-                            port += objDist[obj[portBefore5]];
-                          });
-                        }
-                        var alive = "spys";
-                        var type = $(this).find("td:nth-child(2)").find(".spy1").text();
-                        var postTime = moment().format("L");
-                        if (ip !== "" && port !== "" && alive !== "") {
-                          spyNum++;
-                          insert(ip, port, alive, type, postTime);
-                          if (i <= list.length - 1) {
-                            console.log('当前页面: ' + baseUrl + url + '\n' + "spys: ip " + ip + ":" + port + "抓取结束,抓取数量" + spyNum);
-                          }
-                        }
-                      }
-                    });
-                    callback(null);
-                  } else {
-                    getCountryProxy(ip);
-                  }
-                });
-              });
-              // },3000)
-
-            case 1:
-            case "end":
-              return _context2.stop();
-          }
+      // .set("Accept-Language", "zh-CN,zh;q=0.9")
+      // .set("Accept-Encoding", "gzip, deflate")
+      .set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36").set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+      // .set("Referer", "http://spys.one/free-proxy-list/CZ/")
+      .set("Content-Type", "application/x-www-form-urlencoded")
+      // .type('form')
+      .send({
+        xx0: xx0,
+        xpp: 5,
+        xf1: 0,
+        xf2: 0,
+        xf4: 0,
+        xf5: 0
+      }).end(function (err, res) {
+        if (err) {
+          console.log(err);
         }
-      }, _callee2, this);
-    }));
+        if (res.text) {
+          var $ = cheerio.load(res.text);
+          var script = $("script").eq(3)[0].children[0].data;
+          var script1 = decode(script);
+          var list = $("td[colspan=10]").first().find("tbody").find("tr");
+          var arr = script1.split(";");
+          var disarr = [];
+          var obj = {};
+          var objDist = {};
+          arr.map(function (l, i) {
+            if (l.length >= 18) {
+              obj[l.substring(l.indexOf("="), -1)] = l.substring(l.indexOf("=") + 1).substring("^", l.substring(l.indexOf("=") + 1).indexOf("^"));
+            }
+            if (l.length <= 15) {
+              objDist[l.substring(l.indexOf("="), -1)] = l.substring(l.indexOf("=") + 1);
+            }
+          });
+          list.each(function (i, e) {
+            if (i > 2) {
+              var ip = $(this).find("td:nth-child(1)").find(".spy14").text();
+              if ($(this).find("td:nth-child(1)").find(".spy14").children()[0]) {
+                var portBefore1 = $(this).find("td:nth-child(1)").find(".spy14").children()[0].children[0].data;
+                var portBefore2 = portBefore1.substring(portBefore1.indexOf("+") + 1);
+                var portBefore3 = portBefore2.substring(portBefore2.length - 1, -1);
 
-    return function (_x, _x2) {
-      return _ref2.apply(this, arguments);
-    };
-  }(), function (err, res) {
+                var portBefore4 = portBefore3.split("+");
+                var port = "";
+                portBefore4.map(function (l, i) {
+                  var portBefore5 = l.substring(l.indexOf("^"), -1).substring(1);
+                  port += objDist[obj[portBefore5]];
+                });
+              }
+              var alive = "spys";
+              var type = $(this).find("td:nth-child(2)").find(".spy1").text();
+              var postTime = moment().format("L");
+              if (ip !== "" && port !== "" && alive !== "") {
+                spyNum++;
+                insert(ip, port, alive, type, postTime);
+                if (i <= list.length - 1) {
+                  console.log('当前页面: ' + baseUrl + url + '\n' + "spys: ip " + ip + ":" + port + "抓取结束,抓取数量" + spyNum);
+                }
+              }
+            }
+          });
+          callback(null);
+        } else {
+          getCountryProxy(ip);
+        }
+      });
+    });
+    // },3000)
+  }, function (err, res) {
     console.log(err, res);
     console.log("所有国家IP抓取结束");
     // setTimeout(() => {

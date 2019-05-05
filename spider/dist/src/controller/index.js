@@ -13,9 +13,11 @@ var XC = require("../../schema/xc");
  * @getIp
  */
 function getIp(res) {
-  XC.aggregate([{ $match: { eff: { $exists: false
-        //  type: "HTTPS" 
-      } } }, { $sample: { size: 50 } }]).exec(function (err, data) {
+  XC.aggregate([
+  // { $match: { eff: { $exists: false }
+  // //  type: "HTTPS" 
+  //  } },
+  { $sample: { size: 1 } }]).exec(function (err, data) {
     res.send(JSON.stringify(data));
   });
 }

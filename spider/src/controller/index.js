@@ -7,10 +7,10 @@ var XC = require("../../schema/xc");
  */
 export function getIp(res) {
   XC.aggregate([
-    { $match: { eff: { $exists: false }
-    //  type: "HTTPS" 
-     } },
-    { $sample: { size: 50 } }
+    // { $match: { eff: { $exists: false }
+    // //  type: "HTTPS" 
+    //  } },
+    { $sample: { size: 1 } }
   ]).exec(function(err, data) {
     res.send(JSON.stringify(data));
   });

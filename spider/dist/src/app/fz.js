@@ -90,17 +90,17 @@ var getIp = function () {
 }();
 
 var getInfo = function () {
-  var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee4(Num) {
+  var _ref4 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee5(Num) {
     var obj, userAgent, ip;
-    return _regenerator2.default.wrap(function _callee4$(_context4) {
+    return _regenerator2.default.wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context4.prev = _context4.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
-            _context4.next = 2;
+            _context5.next = 2;
             return getIp();
 
           case 2:
-            obj = _context4.sent;
+            obj = _context5.sent;
             userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
             ip = "http://" + obj.ip + ":" + obj.port;
 
@@ -115,11 +115,11 @@ var getInfo = function () {
             superagent.get(baseUrl + "chuzu" + "/pn" + pageNum) //这里设置编码
             .set({ "User-Agent": userAgent }).set({
               Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
-            }).proxy(ip).timeout({ response: 4000, deadline: 60000 }).end(function (err, res) {
+            }).proxy(ip).timeout({ response: 5000 }).end(function (err, res) {
               if (err) {
                 console.log("抓取第" + pageNum + "页 [列表信息]的时候出错了,错误信息:" + err);
 
-                getInfo();
+                getInfo(pageNum);
                 console.log("正在重新获取IP...");
                 return;
               }
@@ -129,7 +129,7 @@ var getInfo = function () {
               if ($("html head script").last()[0] && $("html head script").last()[0].children[0]) {
                 var bBase64 = $("html head script").last()[0].children[0].data; // base64处理前
                 var aBase64 = (0, _reg.baseReg)(bBase64); // base64处理后
-                aBase64 = new Buffer(aBase64, "base64");
+                aBase64 = Buffer.from(aBase64, 'base64');
                 var list = $(".listUl li");
                 var title = $(".des h2 a");
                 var sum = $(".price .sum b").text() + $(".price .sum");
@@ -228,11 +228,11 @@ var getInfo = function () {
                          * 遍历DOM 进行存储
                          */
                         async.mapLimit(list, 4, function () {
-                          var _ref4 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3(e, callback) {
+                          var _ref5 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee4(e, callback) {
                             var url, title, sum, cmArr, huxing, cm, villageName, road, isPerson, postTime, location;
-                            return _regenerator2.default.wrap(function _callee3$(_context3) {
+                            return _regenerator2.default.wrap(function _callee4$(_context4) {
                               while (1) {
-                                switch (_context3.prev = _context3.next) {
+                                switch (_context4.prev = _context4.next) {
                                   case 0:
                                     // var obj = await getIp();
                                     // var ip = "http://" + obj["ip"] + ":" + obj["port"];
@@ -261,17 +261,17 @@ var getInfo = function () {
 
                                   case 12:
                                   case "end":
-                                    return _context3.stop();
+                                    return _context4.stop();
                                 }
                               }
-                            }, _callee3, this);
+                            }, _callee4, this);
                           }));
 
-                          return function (_x14, _x15) {
-                            return _ref4.apply(this, arguments);
+                          return function (_x16, _x17) {
+                            return _ref5.apply(this, arguments);
                           };
                         }(), function (err, res) {
-                          if (!err) {
+                          if (err) {
                             console.log("===============出错重新运行=====================");
                             console.log(err);
                             getInfo();
@@ -281,9 +281,10 @@ var getInfo = function () {
                               console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
                               console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
                               console.log("===============现在开始获取第" + pageNum + "页的信息了=====================");
-                              fs.writeFile("curPage.txt", pageNum, function (err) {});
+                              fs.writeFile("./curPage.txt", pageNum, function (err) {});
                               getInfo();
                             } else {
+                              fs.writeFile("./curPage.txt", pageNum, function (err) {});
                               console.log("获取结束");
                               return;
                             }
@@ -305,14 +306,14 @@ var getInfo = function () {
 
           case 6:
           case "end":
-            return _context4.stop();
+            return _context5.stop();
         }
       }
-    }, _callee4, this);
+    }, _callee5, this);
   }));
 
-  return function getInfo(_x13) {
-    return _ref3.apply(this, arguments);
+  return function getInfo(_x15) {
+    return _ref4.apply(this, arguments);
   };
 }();
 
@@ -354,13 +355,14 @@ charset(superagent);
 // var ep = eventproxy();
 moment.locale("zh-cn");
 var parser = new xml2js.Parser();
-fs.readFile("curPage.txt", "utf-8", function (err, data) {
+fs.readFile("./curPage.txt", "utf-8", function (err, data) {
   pageNum = data;
 });
 
 function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, villageName, road, location, postTime, trFontlist, callback) {
-  superagent.post("https:" + url).set({ "User-Agent": userAgent }).set({
-    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"
+  // var ip = 'http://127.0.0.1:1080'
+  superagent.post(url).set({ "User-Agent": userAgent }).set({
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3"
   }).proxy(ip).timeout({ response: 5000, deadline: 60000 }).end(function (err, res) {
     if (err) {
       console.log("抓取第" + pageNum + "页[详情]信息的时候出错了,错误信息:" + err);
@@ -375,98 +377,125 @@ function getDetail(isPerson, userAgent, ip, url, title, sum, cmArr, huxing, cm, 
     var payWay = $(".house-pay-way.f16") // 支付方式
     .find("span").eq(1).text();
 
-    superagent.get(encodeURI("http://api.map.baidu.com/geocoder/v2/?address=" + "乌鲁木齐市" + area + "&output=XML&ak=" + baiduAK + "&callback=showLocation")).end(function (err, res) {
-      if (err) {
-        console.log("抓取第" + pageNum + "页[坐标信息]的时候出错了");
-        return;
-      }
-      parser.parseString(res.text, function (err, result) {
-        location.lat = result.GeocoderSearchResponse.result[0].location[0].lat[0];
-        location.lng = result.GeocoderSearchResponse.result[0].location[0].lng[0];
-      });
+    superagent.get(encodeURI("http://api.map.baidu.com/geocoder/v2/?address=" + "乌鲁木齐市" + area + "&output=XML&ak=" + baiduAK + "&callback=showLocation")).end(function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/_regenerator2.default.mark(function _callee3(err, res) {
+        var realSum, realTitle, realCm, realHuxing, str, strTitle, strCm, strHuxing, strArr, titleArr, cmArr, huxingArr;
+        return _regenerator2.default.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!err) {
+                  _context3.next = 3;
+                  break;
+                }
 
-      if (url && area.length > 1 && payWay.length > 1) {
-        var realSum = "";
-        var realTitle = "";
-        var realCm = "";
-        var realHuxing = "";
-        var str = (0, _common.uniencode)(sum);
-        var strTitle = (0, _common.uniencode)(title);
-        var strCm = (0, _common.uniencode)(cm);
-        var strHuxing = (0, _common.uniencode)(huxing);
-        var strArr = str.split("%");
-        var titleArr = strTitle.split("%");
-        var cmArr = strCm.split("%");
-        var huxingArr = strHuxing.split("%");
-        strArr.map(function (l, i) {
-          strArr[i] = strArr[i].toLowerCase();
-          strArr[i] = strArr[i];
-        });
-        strArr.map(function (l, i) {
-          if (l != "") {
-            realSum += trFontlist.indexOf(l);
-          }
-        });
-        titleArr.map(function (l, i) {
-          var curL = trFontlist.indexOf(l.toLowerCase()) == -1 ? false : true;
-          // 是字体文件
-          if (curL) {
-            realTitle += trFontlist.indexOf(titleArr[i].toLowerCase());
-          }
-          // 不是字体文件
-          else if (l != "" && trFontlist.indexOf(titleArr[i].toLowerCase()) == -1) {
-              realTitle += (0, _common.decodeUnicode)("\\" + l);
-            }
-        });
-        cmArr.map(function (l, i) {
-          var curL = trFontlist.indexOf(l.toLowerCase()) == -1 ? false : true;
-          // 是字体文件
-          if (curL) {
-            realCm += trFontlist.indexOf(cmArr[i].toLowerCase());
-          }
-          // 不是字体文件
-          else if (l != "" && trFontlist.indexOf(cmArr[i].toLowerCase()) == -1) {
-              realCm += (0, _common.decodeUnicode)("\\" + l);
-            }
-        });
-        huxingArr.map(function (l, i) {
-          var curL = trFontlist.indexOf(l.toLowerCase()) == -1 ? false : true;
-          // 是字体文件
-          if (curL) {
-            realHuxing += trFontlist.indexOf(huxingArr[i].toLowerCase());
-          }
-          // 不是字体文件
-          else if (l != "" && trFontlist.indexOf(huxingArr[i].toLowerCase()) == -1) {
-              realHuxing += (0, _common.decodeUnicode)("\\" + l);
-            }
-        });
+                console.log("抓取第" + pageNum + "页[坐标信息]的时候出错了");
+                return _context3.abrupt("return");
 
-        insert(url, realTitle, realSum, villageName, road, area, payWay, isPerson, postTime, location, realCm, realHuxing);
-        console.log("房价字体已经过转换:" + sum + "==>" + realSum + "\n" + "标题字体已转换:" + title + "==>" + realTitle + "\n" + "户型字体已转换:" + huxing + "==>" + realHuxing + "\n");
-        console.log("【" + title + "】页详情抓取结束\n");
-        callback();
-      } else {
-        // getDetail(
-        //   isPerson,
-        //   userAgent,
-        //   ip,
-        //   url,
-        //   title,
-        //   sum,
-        //   cmArr,
-        //   huxing,
-        //   cm,
-        //   villageName,
-        //   road,
-        //   location,
-        //   postTime,
-        //   trFontlist,
-        //   callback
-        // );
-        console.log("【" + title + "】页详情抓取失败，【放弃】抓取!!!!\n");
-        return;
-      }
-    });
+              case 3:
+                parser.parseString(res.text, function (err, result) {
+                  location.lat = result.GeocoderSearchResponse.result[0].location[0].lat[0];
+                  location.lng = result.GeocoderSearchResponse.result[0].location[0].lng[0];
+                });
+
+                if (url && area.length > 0 && payWay.length > 0) {
+                  realSum = "";
+                  realTitle = "";
+                  realCm = "";
+                  realHuxing = "";
+                  str = (0, _common.uniencode)(sum);
+                  strTitle = (0, _common.uniencode)(title);
+                  strCm = (0, _common.uniencode)(cm);
+                  strHuxing = (0, _common.uniencode)(huxing);
+                  strArr = str.split("%");
+                  titleArr = strTitle.split("%");
+                  cmArr = strCm.split("%");
+                  huxingArr = strHuxing.split("%");
+
+                  strArr.map(function (l, i) {
+                    strArr[i] = strArr[i].toLowerCase();
+                    strArr[i] = strArr[i];
+                  });
+                  strArr.map(function (l, i) {
+                    if (l != "") {
+                      realSum += trFontlist.indexOf(l);
+                    }
+                  });
+                  titleArr.map(function (l, i) {
+                    var curL = trFontlist.indexOf(l.toLowerCase()) == -1 ? false : true;
+                    // 是字体文件
+                    if (curL) {
+                      realTitle += trFontlist.indexOf(titleArr[i].toLowerCase());
+                    }
+                    // 不是字体文件
+                    else if (l != "" && trFontlist.indexOf(titleArr[i].toLowerCase()) == -1) {
+                        realTitle += (0, _common.decodeUnicode)("\\" + l);
+                      }
+                  });
+                  cmArr.map(function (l, i) {
+                    var curL = trFontlist.indexOf(l.toLowerCase()) == -1 ? false : true;
+                    // 是字体文件
+                    if (curL) {
+                      realCm += trFontlist.indexOf(cmArr[i].toLowerCase());
+                    }
+                    // 不是字体文件
+                    else if (l != "" && trFontlist.indexOf(cmArr[i].toLowerCase()) == -1) {
+                        realCm += (0, _common.decodeUnicode)("\\" + l);
+                      }
+                  });
+                  huxingArr.map(function (l, i) {
+                    var curL = trFontlist.indexOf(l.toLowerCase()) == -1 ? false : true;
+                    // 是字体文件
+                    if (curL) {
+                      realHuxing += trFontlist.indexOf(huxingArr[i].toLowerCase());
+                    }
+                    // 不是字体文件
+                    else if (l != "" && trFontlist.indexOf(huxingArr[i].toLowerCase()) == -1) {
+                        realHuxing += (0, _common.decodeUnicode)("\\" + l);
+                      }
+                  });
+
+                  insert(url, realTitle, realSum, villageName, road, area, payWay, isPerson, postTime, location, realCm, realHuxing);
+                  console.log("房价字体已经过转换:" + sum + "==>" + realSum + "\n" + "标题字体已转换:" + title + "==>" + realTitle + "\n" + "户型字体已转换:" + huxing + "==>" + realHuxing + "\n");
+                  console.log("【" + title + "】页详情抓取结束\n");
+                  callback();
+                } else {
+                  //             let obj = await getIp();
+                  // let userAgent = userAgents[parseInt(Math.random() * userAgents.length)];
+                  // let ip = "http://" + obj.ip + ":" + obj.port;
+                  // getDetail(
+                  //   isPerson,
+                  //   userAgent,
+                  //   ip,
+                  //   url,
+                  //   title,
+                  //   sum,
+                  //   cmArr,
+                  //   huxing,
+                  //   cm,
+                  //   villageName,
+                  //   road,
+                  //   location,
+                  //   postTime,
+                  //   trFontlist,
+                  //   callback
+                  // );
+                  console.log("【" + title + "】页详情抓取失败，【放弃】抓取!!!!\n");
+                  callback('err');
+                }
+
+              case 5:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      return function (_x13, _x14) {
+        return _ref3.apply(this, arguments);
+      };
+    }());
   });
 }
 
