@@ -15,9 +15,9 @@
 2018年12月 开始着重维护ip池。目前完成了ip抓取、ip筛选。现在ip源来自国外，质量比较高。  
 2019年1月 完成了个人房源转换 保存页数 并发控制在3以确保被爬网页不封IP。  
 
-![1](https://github.com/RentSpider/RentSpider/blob/master/img/1.png?raw=true)  
+![1](https://raw.githubusercontent.com/GonyMaster/RentSpider/master/img/1.png)  
 
-![2](https://github.com/RentSpider/RentSpider/blob/master/img/2.png?raw=true)
+![2](https://raw.githubusercontent.com/GonyMaster/RentSpider/master/img/2.png)
 
 ### 抓取的信息格式
   ``` js
