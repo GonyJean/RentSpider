@@ -26,7 +26,7 @@
     "superagent": "^3.8.3",
     "superagent-charset": "^1.2.0",
     "superagent-jsonapify": "^1.4.5",
-    "superagent-proxy": "^2.0.0",
+    "superagent-proxy": "^3.0.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
